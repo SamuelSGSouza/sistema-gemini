@@ -98,11 +98,11 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": "db",
-        "USER": "doadmin",
-        "PASSWORD": "AVNS_w4KoIpm8lZ2YJnWjDCS",
-        "HOST": "app-d21eca53-7388-4843-93dd-23902a422253-do-user-14362428-0.b.db.ondigitalocean.com",
-        "PORT": "25060",
+        "NAME": os.getenv("DB_NAME"),
+        "USER": os.getenv("DB_USER"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
+        "HOST": os.getenv("DB_HOST"),
+        "PORT": os.getenv("DB_PORT"),
     }
 }
 
