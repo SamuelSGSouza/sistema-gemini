@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% block title %}Cadastro de Coordenador{% endblock %}
+{% block body %}
+
+
+<!-- Layout container -->
+<div class="midde_cont">
+  <div class="container-fluid">
+    <div class="row column_title">
+        <div class="col-md-12">
+            <div class="page_title">
+              <h2>Cadastro de Coordenador</h2>
+            </div>
+        </div>
+    </div>
+    {% include 'parcials/_messages.html' %}
+    <h5 class="">Insira os Dados do Novo Coordenador:</h5>
+    <div class="container-fluid mt-2">
+        <form action="" method="POST">
+            <div class="row">
+
+                
+            {% csrf_token %}
+            <div class="col-md-6 mb-3">
+                <label class="form-label" for="basic-icon-default-fullname">Nome Completo</label>
+                <div class="input-group input-group-merge">
+                <span id="basic-icon-default-fullname2" class="input-group-text"
+                    ><i class="fa fa-user"></i
+                ></span>
+                <input type="text" placeholder="João Pedro" name="nome" class="form-control" value = "{{nome_coordenador}}" required/>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3  " id="cpf-wrap">
+                <label class="form-label" for="basic-icon-default-fullname">CPF (somente números)</label>
+                <div class="input-group input-group-merge ">
+                <span id="basic-icon-default-fullname2" class="input-group-text"
+                    ><i class="fa fa-file-text-o"></i
+                ></span>
+                <input type="text" name="cpf" id="cpf-input" placeholder="000.000.000-00"  class="form-control " value="{{cpf_coordenador}}" required/>
+                </div>
+                <div id="cpf-error"></div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label" for="basic-icon-default-fullname">Telefone</label>
+                <div class="input-group input-group-merge ">
+                <span id="basic-icon-default-fullname2" class="input-group-text"
+                    ><i class="fa fa-phone"></i
+                ></span>
+                <input type="text" placeholder="(00) 00000-0000" name="telefone" id="telefone-input"  class="form-control " value="{{telefone_coordenador}}" required/>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label" for="basic-icon-default-fullname">Email</label>
+                <div class="input-group input-group-merge ">
+                <span id="basic-icon-default-fullname2" class="input-group-text"
+                    ><i class="fa fa-envelope-square"></i
+                ></span>
+                <input type="email" placeholder="exemplo@hotmail.com" name="email" class="form-control " value="{{email_coordenador}}" required/>
+                </div>
+            </div>
+
+
+            <div class="col-md-3 mb-3">
+                <label class="form-label" for="basic-icon-default-fullname">Nome de Usuário</label>
+                <div class="input-group input-group-merge ">
+                <span id="basic-icon-default-fullname2" class="input-group-text"
+                    ><i class="fa fa-hand-o-right"></i
+                ></span>
+
+                <input type="text" placeholder="joao_pedro" name="username" class="form-control " value="{{user_coordenador}}" required/>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-3" id="senha-wrap">
+                <label class="form-label" for="basic-icon-default-fullname">Senha</label>
+                <div class="input-group input-group-merge ">
+                <span id="basic-icon-default-fullname2" class="input-group-text"
+                    ><i class="fa fa-eye-slash"></i
+                ></span>
+
+                <input type="password" id="password" oninput="verificaSenha()"  name="senha" class="form-control " value="{{senha_coordenador}}" required/>
+                </div>
+                <!-- erros -->
+                <div id="senha-erro"></div>
+
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <label class="form-label" for="basic-icon-default-fullname">Repita a Senha</label>
+                <div class="input-group input-group-merge ">
+                <span id="basic-icon-default-fullname2" class="input-group-text"
+                    ><i class="fa fa-eye-slash"></i
+                ></span>
+
+                <input type="password" id="password2"  name="senha2" class="form-control " value="{{senha_coordenador}}" required/>
+                </div>
+            </div>
+
+
+            <div class="col-md-12">
+                <button id="btn-cadastrar" type="submit" class="btn btn-success" >Cadastrar</button>
+                <a class="btn btn-secondary mx-2" href="{% url 'home_coordenador_geral' %}">Cancelar</a>
+        
+            </div>
+                    
+            </div>
+        </form>
+                
+    </div>
+  </div>
+  
+<!-- jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<!-- Popper JS -->
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+  
+<script>
+    $(document).ready(function(){
+      $('#cpf-input').mask('000.000.000-00');
+        $('#telefone-input').mask('(00) 00000-0000');
+    });
+
+    function verificaSenha(){
+        //senha deve ter no mínimo 6 caracteres
+        if($('#password').val().length < 6){
+            $('#senha-wrap').addClass('form-invalid');
+            $('#password').focus();
+            $('#senha-erro').html('A senha deve ter no mínimo 6 caracteres');
+            return false;
+        }
+        //senha deve ter no mínimo 1 letra e 1 número
+        if(!$('#password').val().match(/[a-z]/i) || !$('#password').val().match(/[0-9]/i)){
+            $('#senha-wrap').addClass('form-invalid');
+            $('#password').focus();
+            $('#senha-erro').html('A senha deve conter letras e números');
+            return false;
+        }
+
+        $('#senha-wrap').removeClass('form-invalid');
+        $('#senha-erro').html('');
+        return true;
+    }
+
+    //verifica se as senhas são iguais
+    $('#password2').on('input', function(){
+        if($('#password').val() != $('#password2').val()){
+            $('#senha-wrap').addClass('form-invalid');
+            $('#password2').focus();
+            $('#senha-erro').html('As senhas não são iguais');
+            $('button[type="submit"]').prop('disabled', true);
+            //remove a classe danger do botão
+            $('button[type="submit"]').removeClass('btn-success');
+            //adiciona a classe success no botão
+            $('button[type="submit"]').addClass('btn-danger');
+            return false;
+        }else{
+        //habilita o botão de envio
+            $('button[type="submit"]').prop('disabled', false);
+            //remove a classe danger do botão
+            $('button[type="submit"]').removeClass('btn-danger');
+            //adiciona a classe success no botão
+            $('button[type="submit"]').addClass('btn-success');
+
+        }
+        
+        $('#senha-wrap').removeClass('form-invalid');
+        $('#senha-erro').html('');
+        return true;
+    });
+
+    
+
+  </script>
+</div> 
+{% endblock %}
+    

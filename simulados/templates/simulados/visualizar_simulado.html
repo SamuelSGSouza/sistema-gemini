@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block header %}
+<!-- <link rel="stylesheet" href="{% static 'simulados/css/simulado.css' %}"> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+{% endblock %}
+
+{% block body %}
+<div class="midde_cont">
+  <div class="container-fluid">
+    <div class="row column_title">
+      <div class="col-md-12">
+          <div class="page_title">
+          </div>
+      </div>
+    </div>
+    {% include 'parcials/_messages.html' %}
+    <div class="container-fluid mt-2">
+        <div class="row">
+          <div class="col-lg-12 mb-4">
+
+            <!-- Hoverable Table rows -->
+            <div id="exportContent">
+            <div class="font-weight-bold">
+                {% include 'parcials/_messages.html' %}
+
+                {%  for q in questoes %}
+                    <div class="container my-2">
+                        <div class="card-questao">
+                            <div class="row">
+                                <div class="col-md-12 px-4 py-2 fwb text-black" id="card_questao_{{q.id}}">
+
+                                    <p>
+                                        <span class="text-primary mr-2">{{q.numero_questao}}.</span>
+                                        {{q.questao.enunciado}}
+                                    </p>
+                                    {% if q.questao.suporte_texto %}
+                                        <p>
+                                            <span class="text-primary">Texto:</span>
+                                            {{q.questao.suporte_texto}}
+                                        </p>
+                                    {% endif %}
+                                    {% if q.questao.suporte_imagem %}
+                                        <p>
+                                            
+                                            <img src="{{q.questao.suporte_imagem.url}}" alt="" style="max-height: 100px">
+                                            <br><span class="text-primary" style="font-size: 12px">Imagem 1</span>
+                                        </p>
+                                    {% endif %}
+                                    <p>
+                                        <span class="text-primary mr-2">(A)</span>
+                                        {% if q.questao.alternativa_a %}
+                                          {{q.questao.alternativa_a}}
+                                        {% endif %}
+
+                                        {% if q.questao.alternativa_a_imagem %}
+                                          <img src="{{q.questao.alternativa_a_imagem.url}}" alt="" style="max-height: 100px">
+                                        {% endif %}
+                                    </p>
+                                    <p>
+                                        <span class="text-primary mr-2">(B)</span>
+                                        {% if q.questao.alternativa_b %}
+                                          {{q.questao.alternativa_b}}
+                                        {% endif %}
+
+                                        {% if q.questao.alternativa_b_imagem %}
+                                          <img src="{{q.questao.alternativa_b_imagem.url}}" alt="" style="max-height: 100px">
+                                        {% endif %}
+                                    </p>
+                                    <p>
+                                        <span class="text-primary mr-2">(C)</span>
+                                        {% if q.questao.alternativa_c %}
+                                          {{q.questao.alternativa_c}}
+                                        {% endif %}
+
+                                        {% if q.questao.alternativa_c_imagem %}
+                                          <img src="{{q.questao.alternativa_c_imagem.url}}" alt="" style="max-height: 100px">
+                                        {% endif %}
+                                    </p>
+                                    <p>
+                                        <span class="text-primary mr-2">(D)</span>
+                                        {% if q.questao.alternativa_d %}
+                                          {{q.questao.alternativa_d}}
+                                        {% endif %}
+
+                                        {% if q.questao.alternativa_d_imagem %}
+                                          <img src="{{q.questao.alternativa_d_imagem.url}}" alt="" style="max-height: 100px">
+                                        {% endif %}
+                                    </p>
+
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                
+                    
+              </div><!-- Fim do Card -->
+            </div> <!-- Fim do export content -->
+              <button class="btn btn-primary mt-2" id="download-button" onclick="Download()"  >Exportar</button>
+          </div> <!-- Fim do col-lg-12 -->
+        </div> <!-- Fim do row -->
+
+        
+            
+
+
+    </div>
+  </div>
+</div>
+
+  <script>
+    function Download(){
+      //econdendo o botão de exportar
+      document.getElementById("download-button").style.display = "none";
+      //simulando o ctrl + p
+      window.print();
+      //voltando o botão de exportar
+      document.getElementById("download-button").style.display = "block";
+    }
+</script>
+{% endblock %}
+    

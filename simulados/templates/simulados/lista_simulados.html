@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block header %}
+<link rel="stylesheet" href="{% static 'simulados/css/simulado.css' %}">
+{% endblock %}
+{% block title %}Lista de Simulados{% endblock %}
+{% block body %}
+
+
+<!-- Layout container -->
+<div class="midde_cont">
+  <div class="container-fluid">
+    <div class="row column_title">
+        <div class="col-md-12">
+            <div class="page_title">
+              <h2>Lista de Simulados</h2>
+            </div>
+        </div>
+    </div>
+    {% include 'parcials/_messages.html' %}
+    <h5 class="">O que deseja fazer?</h5>
+    <div class="container-fluid mt-2">
+      <div class="row mb-3">
+
+        {% if request.session.classe == "Coordenador Geral" or request.session.classe == "Professor"  %}
+        <div class="col-md-4 text-center my-3">
+            <a href="{% url 'construir_simulado' %}" class="btn btn-outline-primary">
+              Construir Simulado 
+              {% if request.session.classe == "Coordenador Geral"  %}
+                Geral
+              {% endif %}
+              </a>
+        </div>
+        {% endif %}
+
+        {% if request.session.classe == "Professor" %}
+          <div class="col-md-4 text-center my-3">
+              <a href="{% url 'cadastrar_simulado' %}" class="btn btn-outline-primary">Cadastrar Simulado</a>
+          </div>
+
+          
+          <div class="col-md-4 text-center my-3">
+              <a href="{% url 'simulado_proficiencia' %}" class="btn btn-outline-primary">Simulado Proficiência</a>
+          </div>
+        {% endif %}
+
+      </div>
+
+      <div class="table-responsive text-nowrap pb-5 ">
+        <table class="table table-hover text-center">
+          <thead>
+            <tr >
+              <th class="">Nome</th>
+              <th class="">Visualizar Simulado</th>
+              {% if request.session.classe == "Coordenador Geral" or request.session.classe == "Secretário" %}
+                <th class="">Acertos Totais (Média das Escolas)</th>
+              {% endif %}
+              <th class="">Visualizar Relatório</th>
+              {% if request.session.classe == "Professor" %}
+                <th class="">Tipo de Simulado</th>
+              {% endif %}
+              {% if request.session.classe != "Secretário"%}
+                <th class="">Ações</th>
+              {% endif %}
+            </tr>
+          </thead>
+          <tbody class="table-border-bottom-0">
+            {% for simulado in simulados %}
+              <tr {% if simulado.tipo_simulado == "questoes_gerais" %} class="th_simulado_geral" {% endif %}>
+                <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>{{simulado.nome}}</strong></td>
+                <td >
+                  {% if simulado.tipo_simulado == "questoes_construidas" or simulado.tipo_simulado == "questoes_gerais" %}
+                  <a href="{% url 'visualizar_simulado' simulado.id %}" class="white-hover"><i class="fa fa-eye"></i></a>
+                  {% endif %}
+                </td>
+                {% if request.session.classe == "Coordenador Geral" or request.session.classe == "Secretário" %}
+                  <td class="">{{simulado.media_acertos}}%</td>
+                {% endif %}
+                <td>
+                  {% if request.session.classe == "Coordenador Geral" or request.session.classe == "Secretário" %}
+                    <a href="#" class="white-hover" data-toggle="modal" data-target="#modalEscola{{simulado.id}}"><i class="fa fa-line-chart"></i></a>
+                  {% elif request.session.classe == "Coordenador" %}
+                    <a href="#" class="white-hover" data-toggle="modal" data-target="#modalTurmas{{simulado.id}}" class="white-hover"><i class="fa fa-line-chart"></i></a>
+                  {% else %}
+                    <a href="{% url 'visualizar_relatorio' simulado.id %}" class="white-hover"><i class="fa fa-line-chart"></i></a>
+                  {% endif %}
+                </td>
+                {% if request.session.classe == "Professor" %}
+                <td>
+                  {{ simulado.get_tipo_simulado_display  }}
+                </td>
+                {% endif %}
+                {% if request.session.classe != "Secretário"%}
+                  <td>
+                    {% if request.session.classe == "Professor" %}
+                      <a title="Adicionar Gabarito" class="white-hover" href="{% url 'preenche_gabarito' simulado.id %}"
+                        ><i class="fa fa-plus"></i></a
+                      >
+                    {% endif %}
+                    {% if request.session.classe == "Coordenador Geral" or request.session.classe == "Secretário" %}
+                      <a title="Deletar Simulado" class="white-hover mx-2" href=""
+                      data-toggle="modal"
+                      data-target="#modalCenter"
+                      onclick="mudaID('{{simulado.id}}', '{{simulado.nome}}')"><i class="fa fa-trash"></i></a
+                      >
+                    {% endif %}
+                </td>
+                {% endif %}
+              </tr>
+              
+              {% include "simulados/modals/modal_turmas.html" with simulado=simulado %}
+              {% include "simulados/modals/modal_escolas.html" with simulado=simulado %}
+            {% endfor %}
+          </tbody>
+        </table>
+
+        
+        
+
+      </div>
+      {% include 'parcials/_pagination.html' %}
+    </div><!-- End container-fluid-->
+  </div><!--End content-wrapper-->
+</div><!--End layout-wrapper-->
+
+
+      
+
+      <div class="content-backdrop fade"></div>
+    </div>
+    <!-- Content wrapper -->
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="modalCenter" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalCenterTitle">Modal title</h5>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <h6>Confirme ou cancele a exclusão abaixo.</h6>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+            Cancelar
+          </button>
+          <form action="" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="id" id="idExcluir" value="">
+            <button type="submit" class="btn btn-danger">Excluir</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+ 
+<script>
+  function mudaID(id, nome){
+    document.getElementById("modalCenterTitle").innerHTML = "Deseja excluir o Simulado " + nome + "?";
+    document.getElementById("idExcluir").value = id;
+  }
+</script>
+{% endblock %}
+    

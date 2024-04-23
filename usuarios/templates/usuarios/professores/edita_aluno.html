@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}Editar Aluno{% endblock %}
+{% block body %}
+
+
+<!-- Layout container -->
+<div class="midde_cont">
+  <div class="container-fluid">
+    <div class="row column_title">
+        <div class="col-md-12">
+            <div class="page_title">
+              <h2>Edição de Aluno</h2>
+            </div>
+        </div>
+    </div>
+    {% include 'parcials/_messages.html' %}
+    <h5 class="">Insira os Novos Dados do Aluno:</h5>
+    <div class="container-fluid mt-2">
+      <div class="row">
+        <div class="col-md-5">
+          <form action="" method="POST">
+            {% include 'parcials/_messages.html' %}
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label" for="basic-icon-default-fullname">Nome Completo</label>
+                <div class="input-group input-group-merge">
+                  <span id="basic-icon-default-fullname2" class="input-group-text"
+                ><i class="fa fa-user"></i
+              ></span>
+                  <input
+                    type="text"
+                    name="nome"
+                    class="form-control"
+                    id="basic-icon-default-fullname"
+                    placeholder="João da Silva"
+                    aria-label="João da Silva"
+                    aria-describedby="basic-icon-default-fullname2"
+                    value = "{{aluno.nome}}"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="basic-icon-default-company">Turma</label>
+                <div class="input-group input-group-merge">
+                  <span id="basic-icon-default-company2" class="input-group-text"
+                ><i class="fa fa-university"></i
+              ></span>
+                  <select name="turma" class="form-control" id="exampleFormControlSelect1" aria-label="Selecione a Turma">
+                    <option selected value="{{aluno.turma}}">{{aluno.turma}}</option>
+                    {% for turma in turmas %}
+                      <option value="{{turma}}">{{turma}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+          <input type="hidden" name="idAluno" value="{{aluno.id}}">
+          <button type="submit" class="btn btn-primary">Editar</button>
+          <a class="btn btn-secondary mx-2" href="{% url 'home_professor' %}">Cancelar</a>
+        </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>            
+
+    
+{% endblock %}
+    

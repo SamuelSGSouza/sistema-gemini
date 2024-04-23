@@ -1,0 +1,6 @@
+Deixar as páginas mais tecnologicas = 			     				800
+Modificar a forma como o desempenho em uma prova é exibido = 				200
+Adicionar login para o aluno poder visualizar o desempenho dele em cada prova = 	300
+Adicionar opção ao professor de enviar o gabarito por excel = 				250
+Adicionar opção de visualizar desempenho do aluno ao longo dos anos para cada área =  	600 (gráfico único)
+

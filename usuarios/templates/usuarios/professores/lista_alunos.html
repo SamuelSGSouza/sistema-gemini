@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Lista de Alunos{% endblock %}
+
+{% block body %} 
+
+
+  <div class="midde_cont">
+      <div class="container-fluid">
+        <div class="row column_title">
+         <div class="col-md-12">
+            <div class="page_title">
+               <h2>Lista de Alunos</h2>
+            </div>
+         </div>
+      </div>
+      {% include 'parcials/_messages.html' %}
+      <h4 class="text-primary">Bem Vindo, {{nome}}!</h4>
+      <h5 class="">Veja os seus alunos cadastrados:</h5>
+      <div class="table-responsive text-nowrap">
+          <a href="{% url 'cadastro_aluno' %}" class="btn btn-sm btn-outline-primary mx-3 my-4">Adicionar Aluno</a>
+      </div>
+      <div class="container-fluid">
+            <!-- Abrindo um loop para cada turma -->
+        <!-- Botões para cada turma -->
+          {% for turma in turmas_alunos %}
+          <button class="btn btn-outline-primary turma-btn mb-3" data-turma="{{turma.turma}}">{{turma.turma}}</button>
+          {% endfor %}
+
+          <!-- Tabelas para cada turma, inicialmente ocultas -->
+          {% for turma in turmas_alunos %}
+          <div class="turma-container" id="{{turma.turma}}" style="display: none;">
+              <h4 class="card-header card-title text-primary">{{turma.turma}}</h4>
+              <table class="table table-hover">
+                  <thead>
+                      <tr>
+                          <th class="text-primary font-weight-bold">Nome</th>
+                          <th class="text-primary font-weight-bold">Ações</th>
+                      </tr>
+                  </thead>
+                  <tbody class="table-border-bottom-0">
+                      <!-- Abrindo um loop para cada aluno na turma atual -->
+                      {% for aluno in turma.alunos %}
+                          <tr>
+                              <td  class="text-primary"><i class="fab fa-angular fa-lg text-danger me-3"></i> <b>{{aluno.nome|title}}</b></td>
+                              <td>
+                                          <a class="white-hover" href="{% url 'edita_aluno' aluno.id %}"
+                                              ><i class="bx bx-edit-alt me-1"></i> <i class="fa fa-edit"></i>Editar</a
+                                          >
+                                          <a class="white-hover" href="#"
+                                          data-toggle="modal"
+                                          data-target="#modalCenter"
+                                          onclick="mudaID('{{aluno.id}}', '{{aluno.nome}}')"><i class="fa fa-trash"></i> Deletar</a
+                                          >
+                              </td>
+                          </tr>
+                      {% endfor %}
+                  </tbody>
+              </table>
+          </div>
+          {% endfor %}
+
+          <!-- JavaScript para lidar com o clique dos botões -->
+          <script>
+          document.addEventListener('DOMContentLoaded', (event) => {
+              const turmaButtons = document.querySelectorAll('.turma-btn');
+              const turmaContainers = document.querySelectorAll('.turma-container');
+
+              turmaButtons.forEach((button) => {
+                  button.addEventListener('click', () => {
+                      const turma = button.getAttribute('data-turma');
+
+                      turmaContainers.forEach((container) => {
+                          if (container.id === turma) {
+                              container.style.display = 'block';
+                          } else {
+                              container.style.display = 'none';
+                          }
+                      });
+                  });
+              });
+          });
+          </script>
+        
+
+      </div>
+  </div>
+  </div>
+
+
+  <!-- Modal -->
+  <div class="modal fade" id="modalCenter" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalCenterTitle">Modal title</h5>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <h6>Confirme ou cancele a exclusão abaixo.</h6>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+            Cancelar
+          </button>
+          <form action="" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="id" id="idExcluir" value="">
+            <button type="submit" class="btn btn-danger">Excluir</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+<script>
+  function mudaID(id, nome){
+    document.getElementById("modalCenterTitle").innerHTML = "Deseja excluir o aluno " + nome + "?";
+    document.getElementById("idExcluir").value = id;
+  }
+</script>
+{% endblock %}
+    

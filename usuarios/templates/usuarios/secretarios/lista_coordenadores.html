@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Lista de Coordenadores{% endblock %}
+
+{% block body %} 
+
+
+  <div class="midde_cont">
+      <div class="container-fluid">
+        <div class="row column_title">
+         <div class="col-md-12">
+            <div class="page_title">
+               <h2>Lista de Coordenadores Geral</h2>
+            </div>
+         </div>
+      </div>
+      {% include 'parcials/_messages.html' %}
+      <h5 class="">Veja a lista dos Coordenadores Geral:</h5>
+      <div class="table-responsive text-nowrap">
+        <a href="{% url 'cria_coordenadores_geral' %}" class="btn btn-outline-primary mx-3 my-4">Cadastrar Coordenador</a>
+    </div>
+      <div class="container-fluid">
+         
+        <div class="table-responsive text-nowrap pb-5 font-weight-bold">
+          <table class="table table-hover text-center">
+            <thead>
+              <tr >
+                <th class="font-weight-bold">Nome</th>
+                <th class="font-weight-bold">Telefone</th>
+                <th class="font-weight-bold">Email</th>
+              </tr>
+            </thead>
+            <tbody class="table-border-bottom-0">
+              {% for obj in coordenadores %}
+                <tr>
+                  <td><strong>{{obj.nome_completo}}</strong></td>
+                  <td>{{obj.telefone}}</td>
+                  <td>{{obj.email}}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          
+  
+        </div>
+
+      </div>
+
+      {% include 'parcials/_pagination.html' %}
+  </div>
+</div>
+
+
+{% endblock %}
+    

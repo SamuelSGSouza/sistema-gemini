@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% block title %}Cadastro de Coordenador{% endblock %}
+{% block body %}
+
+
+<!-- Layout container -->
+<div class="midde_cont">
+  <div class="container-fluid">
+    <div class="row column_title">
+        <div class="col-md-12">
+            <div class="page_title">
+              <h2>Dados de Escola</h2>
+            </div>
+        </div>
+    </div>
+    {% include 'parcials/_messages.html' %}
+    <div class="container-fluid mt-2">
+        <form action="" method="POST">
+            <div class="row">
+
+                
+            {% csrf_token %}
+            <div class="col-md-6 mb-3">
+                <label class="form-label" for="basic-icon-default-fullname">Nome</label>
+                <div class="input-group input-group-merge">
+                <span id="basic-icon-default-fullname2" class="input-group-text"
+                    ><i class="fa fa-user"></i
+                ></span>
+                <input readonly type="text" placeholder="João Pedro" name="nome" class="form-control" value = "{{nome}}" required/>
+                </div>
+            </div>
+            <div class="col-md-5 mb-3  " id="cpf-wrap">
+                <label class="form-label" for="basic-icon-default-fullname" >Endereço</label>
+                <div class="input-group input-group-merge ">
+                <span id="basic-icon-default-fullname2" class="input-group-text"
+                    ><i class="fa fa-file-text-o"></i
+                ></span>
+                        <input readonly type="text" name="endereco" id="endereco-input" value="{{endereco}}" placeholder="AV. Maurício de Souza"  class="form-control "  required/>
+                </div>
+            </div>
+            <div class="col-md-1 mb-3  " id="cpf-wrap">
+                <label class="form-label" for="basic-icon-default-fullname">Número</label>
+                <div class="input-group input-group-merge ">
+                
+                <input readonly type="text" name="numero" id="numero-input" value="{{numero}}"  class="form-control "  required/>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3  " id="cpf-wrap">
+                <label class="form-label" for="basic-icon-default-fullname">Município</label>
+                <div class="input-group input-group-merge ">
+                <span id="basic-icon-default-fullname2" class="input-group-text"
+                    ><i class="fa fa-file-text-o"></i
+                ></span>
+                <input readonly type="text" name="municipio" id="municipio-input" placeholder="São Miguel" value="{{municipio}}" class="form-control "  required/>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3  " id="cpf-wrap">
+                <label class="form-label" for="basic-icon-default-fullname">CEP</label>
+                <div class="input-group input-group-merge ">
+                <span id="basic-icon-default-fullname2" class="input-group-text"
+                    ><i class="fa fa-file-text-o"></i
+                ></span>
+                <input readonly type="text" name="cep" id="cep-input" placeholder="00000-000"  class="form-control "  required/>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label" for="basic-icon-default-fullname">Telefone</label>
+                <div class="input-group input-group-merge ">
+                <span id="basic-icon-default-fullname2" class="input-group-text"
+                    ><i class="fa fa-phone"></i
+                ></span>
+                <input readonly type="text" placeholder="(00) 00000-0000" name="telefone" id="telefone-input"  class="form-control " value="{{telefone_coordenador}}" required/>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label" for="basic-icon-default-fullname">Email</label>
+                <div class="input-group input-group-merge ">
+                <span id="basic-icon-default-fullname2" class="input-group-text"
+                    ><i class="fa fa-envelope-square"></i
+                ></span>
+                <input readonly type="email" placeholder="exemplo@hotmail.com" name="email" class="form-control " value="{{email_coordenador}}" required/>
+                </div>
+            </div>
+            <div class="col-md-6 mt-3"></div>
+            
+
+
+                    
+            </div>
+        </form>
+                
+    </div>
+  </div>
+  
+<!-- jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<!-- Popper JS -->
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+  
+<script>
+    $(document).ready(function(){
+        $('#telefone-input').mask('(00) 00000-0000');
+        $('#cep-input').mask('00000-000');
+    });
+
+    //quando o cep perde o foco, busca o cep
+    $('#cep-input').blur(function(){
+        var cep = $('#cep-input').val();
+        cep = cep.replace('-', '');
+        cep = cep.replace('.', '');
+        cep = cep.replace(' ', '');
+        if(cep.length == 8){
+            $.ajax({
+                url: 'https://viacep.com.br/ws/'+cep+'/json/',
+                type: 'GET',
+                dataType: 'json',
+                success: function(data){
+                    $('#endereco-input').val(data.logradouro);
+                    $('#municipio-input').val(data.localidade);
+                },
+                error: function(){
+                    alert('Erro ao buscar CEP');
+                }
+            });
+        }
+    });
+
+    function AdicionaTurma(){
+        var turma = $('#turma-input').val();
+        var turmas = $('#turmas').val();
+        if(turmas == ''){
+            $('#turmas').val(turma);
+        }else{
+            $('#turmas').val(turmas + ';' + turma);
+        }
+        $('#turmas-inseridas').append('<div class="alert alert-primary alert-dismissible fade show" role="alert">'+
+        turma+
+        '<a href=#  class="close">&times;</a>'+
+        '</div>');
+        $('#turma-input').val('');
+    }
+
+    //onclick no close
+    $(document).on('click', '.close', function(){
+        var turma = $(this).parent().text();
+        turma = turma.replace('×', '');
+        var turmas = $('#turmas').val();
+        turmas = turmas.replace(turma, '');
+        turmas = turmas.replace(';;', ';');
+        ("turmas: " + turmas)
+        $('#turmas').val(turmas);
+        $(this).parent().remove();
+    });
+  </script>
+</div> 
+{% endblock %}

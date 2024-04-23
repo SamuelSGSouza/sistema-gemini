@@ -1,0 +1,23 @@
+{% load static %}
+
+<div class="modal fade" id="modalTurmas{{simulado.id}}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-title" id="modalCenterTitle">Selecione a turma para ver o relatório:</h5>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            {% for turma in turmas %}
+                <a href="{% url 'visualizar_relatorio' simulado.id %}?filtro=turma&valor={{turma}}" class="btn btn-outline-primary turma-btn mb-3" data-turma="{{turma.turma}}">{{turma}}</a>
+            {% endfor %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+            Cancelar
+          </button>
+          
+        </div>
+      </div>
+    </div>
+  </div>

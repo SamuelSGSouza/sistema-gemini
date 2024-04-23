@@ -1,0 +1,26 @@
+from django.contrib import admin
+from .models import *
+
+@admin.register(UnidadeTematica)
+class UnidadeTematicaAdmin(admin.ModelAdmin):
+    list_display = ("unidade", )
+
+@admin.register(HabilidadesBNCC)
+class HabilidadesBNCCAdmin(admin.ModelAdmin):
+    list_display = ("habilidade", )
+
+@admin.register(Simulado)
+class SimuladoAdmin(admin.ModelAdmin):
+    list_display = ("nome", )
+    list_filter = ("nome", )
+
+@admin.register(Questao)
+class QuestaoAdmin(admin.ModelAdmin):
+    list_display = ("matriz_referencial",   )
+    list_filter = ("matriz_referencial",  )
+    search_fields = ("unidade_tematica", "habilidades_abncc", "nivel_proficiencia", )
+
+@admin.register(Resposta)
+class RespostaAdmin(admin.ModelAdmin):
+    list_display = ("resposta",)
+    list_filter = ("resposta",)

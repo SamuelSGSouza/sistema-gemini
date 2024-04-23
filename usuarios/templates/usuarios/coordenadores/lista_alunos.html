@@ -1,0 +1,101 @@
+{% extends 'new_base.html' %}
+{% load static %}
+{% block title %}Lista de Professores{% endblock %}
+
+{% block content %} 
+
+<div class="container-xxl flex-grow-1 container-p-y">
+  <div class="row">
+    <div class="col-lg-12 mb-4 order-0">
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center justify-content-between">
+          <h5 class="card-title text-primary">Lista de Alunos </h5>
+        </div>
+        <div class="card-body">
+          {% include 'parcials/_messages.html' %}
+
+          <div class="table-responsive text-nowrap">
+            <a href="{% url 'coordenador_cadastro_aluno' %}" class="btn btn-outline-primary mx-3 my-4">Cadastrar Aluno</a>
+        </div>
+          <div class="container-fluid">
+             
+            <div class="table-responsive text-nowrap pb-5 font-weight-bold">
+              <table class="table table-hover text-center">
+                <thead>
+                  <tr >
+                    <th class="font-weight-bold">Nome</th>
+                    <th class="font-weight-bold">Turma</th>
+                    <th class="font-weight-bold">Ações</th>
+                  </tr>
+                </thead>
+                <tbody class="table-border-bottom-0">
+                  {% for aluno in alunos %}
+                      <tr>
+                        <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>{{aluno.nome}}</strong></td>
+                        <td>{{aluno.turma}}</td>
+                        <td>
+                            <a class="white-hover"
+                              title="Editar Aluno"
+                             href="{% url 'coordenador_edita_aluno' aluno.id %}"
+                                ><i class="bx bx-edit-alt me-1"></i> <i class="fa fa-edit
+                                "></i></a
+                            >
+                          
+                            <a class="white-hover text-danger" href=""
+                            title="Deletar Aluno"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalCenter"
+                            onclick="mudaID('{{aluno.id}}', '{{aluno.nome}}')"><i class="bx bx-trash"></i><i class="fa fa-trash mx-1"></i></a
+                            >
+    
+                        </td>
+                      </tr>
+                    {% endfor %}
+                </tbody>
+              </table>
+              
+      
+            </div>
+    
+          </div>
+    
+          {% include 'parcials/_pagination.html' %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="modalCenter" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-primary" id="modalCenterTitle">Deletar</h5>
+      </div>
+      <div class="modal-body">
+        <h6>Deletar o aluno fará com que todas as suas notas e respostas de questões sejam perdidas.</h6>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          Cancelar
+        </button>
+        <form action="" method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="id" id="idExcluir" value="">
+          <button type="submit" class="btn btn-danger">Deletar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function mudaID(id, nome){
+  document.getElementById("modalCenterTitle").innerHTML = "Deseja excluir o aluno " + nome + "?";
+  document.getElementById("idExcluir").value = id;
+}
+</script>
+{% endblock %}
+    
+
+    

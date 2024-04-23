@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Lista de Escolas{% endblock %}
+
+{% block body %} 
+
+
+  <div class="midde_cont">
+      <div class="container-fluid">
+        <div class="row column_title">
+         <div class="col-md-12">
+            <div class="page_title">
+               <h2>Lista de Escolas de {{estado}}</h2>
+            </div>
+         </div>
+      </div>
+      {% include 'parcials/_messages.html' %}
+      <h4 class="text-primary">Bem Vindo, {{nome}}!</h4>
+      <!-- <div class="table-responsive text-nowrap">
+        <a href="{% url 'cadastro_aluno' %}" class="btn btn-sm btn-outline-primary mx-3 my-4">Cadastrar Nova Escola</a>
+    </div> -->
+      <h5 class="">Veja as escolas cadastradas no seu estado:</h5>
+      
+      <div class="container-fluid">
+         
+        <div class="table-responsive text-nowrap pb-5 font-weight-bold">
+          <table class="table table-hover text-center">
+            <thead>
+              <tr >
+                <th class="font-weight-bold">Nome</th>
+                <th class="font-weight-bold">Município</th>
+                <th class="font-weight-bold">Telefone</th>
+                <th class="font-weight-bold">Email</th>
+                <th class="font-weight-bold">Coordenador</th>
+              </tr>
+            </thead>
+            <tbody class="table-border-bottom-0">
+              {% for escola in escolas %}
+                <tr>
+                  <td><strong>{{escola.nome}}</strong></td>
+                  <td>{{escola.municipio}}</td>
+                  <td>{{escola.telefone}}</td>
+                  <td>{{escola.email}}</td>
+                  <td>{{escola.coordenador}}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          
+  
+        </div>
+
+      </div>
+
+      {% include 'parcials/_pagination.html' %}
+  </div>
+</div>
+
+
+{% endblock %}
+    

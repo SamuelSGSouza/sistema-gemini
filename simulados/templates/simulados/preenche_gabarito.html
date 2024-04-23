@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Preencher Gabarito{% endblock %}
+{% block header %}
+<link rel="stylesheet" href="{% static 'simulados/css/gabarito.css' %}">
+<!-- <link rel="stylesheet" href="{% static 'simulados/css/simulado.css' %}"> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+{% endblock %}
+
+{% block body %}
+<!-- Layout container -->
+<div class="midde_cont">
+  <div class="container-fluid">
+    <div class="row column_title">
+      <div class="col-md-12">
+          <div class="page_title">
+            <h2>Selecione a Turma para o qual o simulado -Simulado 1- foi aplicado:
+            </h2>
+          </div>
+      </div>
+    </div>
+    {% include 'parcials/_messages.html' %}
+    <div class="container-fluid mt-2">
+      
+      <div class="container">
+          <div class="row">
+          <div class="col-md-10 mb-4 order-0">
+
+            <!-- Hoverable Table rows -->
+            {% include 'parcials/_messages.html' %}
+              <!-- Botões para cada turma -->
+              {% for turma in turmas_alunos %}
+              <button class="btn btn-outline-primary turma-btn mb-3" data-turma="{{turma.turma}}">{{turma.turma}}</button>
+              {% endfor %}
+
+              <!-- Tabelas para cada turma, inicialmente ocultas -->
+              {% for turma in turmas_alunos %}
+              <div class="turma-container " id="{{turma.turma}}" style="display: none;">
+                  <h4 class="card-header card-title text-primary mb-0 pb-3 px-0 mx-0">{{turma.turma}}</h4>
+                  
+                  <form action="" method="POST" class="">
+                    {% csrf_token %}
+                    <input type="hidden" name="turma" value="{{turma.turma}}">
+                    {% for aluno in turma.alunos %}
+                      <div class="border-bottom-primary">
+                        <h5>{{aluno.nome}}</h5>
+                        <div class="row">
+                          {%  for q in questoes %}
+                              <div class="col-md-2">
+                                  <span class="text-primary">Questão {{q.numero_questao}}</span>
+                                  <select id="" name="{{aluno.id}}_resposta_{{q.id}}" class="form-control">
+                                      <option value="" selected>Resposta</option>
+                                      <option value="a">A</option>
+                                      <option value="b">B</option>
+                                      <option value="c">C</option>
+                                      <option value="d">D</option>
+                                  </select>
+                              </div>
+                          {% endfor %}
+                      </div>
+                      
+                    </div>
+                    {% endfor %}
+                    <button class="btn btn-primary mt-4 mb-5"  tupe="submit" >Salvar Gabarito</button>
+                  </form>
+              </div>
+              {% endfor %}
+
+              <!-- JavaScript para lidar com o clique dos botões -->
+              <script>
+              document.addEventListener('DOMContentLoaded', (event) => {
+                  const turmaButtons = document.querySelectorAll('.turma-btn');
+                  const turmaContainers = document.querySelectorAll('.turma-container');
+
+                  turmaButtons.forEach((button) => {
+                      button.addEventListener('click', () => {
+                          const turma = button.getAttribute('data-turma');
+
+                          turmaContainers.forEach((container) => {
+                              if (container.id === turma) {
+                                  container.style.display = 'block';
+                              } else {
+                                  container.style.display = 'none';
+                              }
+                          });
+                      });
+                  });
+              });
+              </script>
+                
+
+               
+              
+          </div> <!-- Fim do col-lg-12 -->
+        </div> <!-- Fim do row -->
+
+        
+            
+      </div> <!-- Fim do container-xxl flex-grow-1 container-p-y -->
+
+    </div> <!-- Fim do container-fluid -->
+  </div> <!-- Fim do row -->
+</div> <!-- Fim do middle_content -->
+  
+{% endblock %}
+    

@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Simulado de Proficiencia{% endblock %}
+{% block header %}
+<link rel="stylesheet" href="{% static 'simulados/css/gabarito.css' %}">
+{% endblock %}
+
+{% block body %}
+<div class="midde_cont">
+  <div class="container-fluid">
+    <div class="row column_title">
+      <div class="col-md-12">
+          <div class="page_title">
+            <h2>Crie Seu Simulado de Proficiência
+            </h2>
+          </div>
+      </div>
+    </div>
+    {% include 'parcials/_messages.html' %}
+    <div class="container-fluid mt-2">
+
+        <div class="row">
+          <form action="{% url 'simulado_proficiencia' %}" method="POST">
+            {% csrf_token %}
+            <div id="blocos-wrap">
+              
+              <div class="col-md-12 bloco mb-3" >
+                <p class="bloco-title card-title text-primary">Bloco de Habilidade 1</p>
+                <div class="my-2">
+                  <label for="nome" class="text-label">Habilidade BNCC do Bloco:</label>
+                  <input type="text" name="habilidade_bncc_1" class="form-control" required>
+                </div>
+                <div class="my-2 d-flex">
+                  <div class="flex-grow-1">
+                    <label for="nome" class="text-label">Pergunta Fácil:</label>
+                    <textarea name="pergunta_facil_1" class="form-control" rows="3" required></textarea>
+                
+                  </div>
+                  <div class="mx-2">
+                    <label for="nome" class="text-label">Número da Questão:</label>
+                    <input type="number" name="numero_questao_facil_1" class="form-control" required>
+                  </div>
+                </div>
+                <div class="my-2 d-flex">
+                  <div class="flex-grow-1">
+                    <label for="nome" class="text-label">Pergunta Intermediária:</label>
+                    <textarea name="pergunta_intermediaria_1" class="form-control" rows="3" required></textarea>
+                
+                  </div>
+                  <div class="mx-2">
+                    <label for="nome" class="text-label">Número da Questão:</label>
+                    <input type="number" name="numero_questao_intermediaria_1" class="form-control" required>
+                  </div>
+                </div>
+                <div class="my-2 d-flex">
+                  <div class="flex-grow-1">
+                    <label for="nome" class="text-label">Pergunta Dificil:</label>
+                    <textarea name="pergunta_dificil_1" class="form-control" rows="3" required></textarea>
+                
+                  </div>
+                  <div class="mx-2">
+                    <label for="nome" class="text-label">Número da Questão:</label>
+                    <input type="number" name="numero_questao_dificil_1" class="form-control" required>
+                  </div>
+                </div>
+
+              </div> <!-- Fim do bloco 1-->
+              
+            </div> <!-- Fim do blocos wrap-->
+            <div class="my-2 d-flex">
+              <div class="flex-grow-1">
+                <label for="nome" class="text-label">Nome do Simulado</label>
+                <input  name="nome_simulado" class="form-control"  required>
+              </div>
+            </div>
+            <button type="button" class="btn btn-success">Adicionar Bloco</button>
+            <button type="submit" class="btn btn-primary">Gerar Simulado</button>
+          </form>
+        </div>
+        
+
+
+    </div>
+  </div>
+</div>
+               
+
+ 
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script>
+  let blocoCount = 2;  // contador para os blocos
+  
+  $(document).ready(function() {
+    $(".btn-success").click(function() {
+      
+      let newBloco = `
+      <div class="col-md-8 bloco mb-3" >
+        <p class="bloco-title card-title text-primary">Bloco de Habilidade ${blocoCount}</p>
+        <div class="my-2">
+          <label for="nome" class="text-label">Habilidade BNCC do Bloco:</label>
+          <input type="text" name="habilidade_bncc_${blocoCount}" class="form-control" required>
+        </div>
+        <div class="my-2 d-flex">
+          <div class="flex-grow-1">
+            <label for="nome" class="text-label">Pergunta Fácil:</label>
+            <textarea name="pergunta_facil_${blocoCount}" class="form-control" rows="3" required></textarea>
+        
+          </div>
+          <div class="mx-2">
+            <label for="nome" class="text-label">Número da Questão:</label>
+            <input type="number" name="numero_questao_facil_${blocoCount}" class="form-control" required>
+          </div>
+        </div>
+        <div class="my-2 d-flex">
+          <div class="flex-grow-1">
+            <label for="nome" class="text-label">Pergunta Intermediária:</label>
+            <textarea name="pergunta_intermediaria_${blocoCount}" class="form-control" rows="3" required></textarea>
+        
+          </div>
+          <div class="mx-2">
+            <label for="nome" class="text-label">Número da Questão:</label>
+            <input type="number" name="numero_questao_intermediaria_${blocoCount}" class="form-control" required>
+          </div>
+        </div>
+        <div class="my-2 d-flex">
+          <div class="flex-grow-1">
+            <label for="nome" class="text-label">Pergunta Dificil:</label>
+            <textarea name="pergunta_dificil_${blocoCount}" class="form-control" rows="3" required></textarea>
+        
+          </div>
+          <div class="mx-2">
+            <label for="nome" class="text-label">Número da Questão:</label>
+            <input type="number" name="numero_questao_dificil_${blocoCount}" class="form-control" required>
+          </div>
+        </div>
+
+        
+      </div>
+      `;
+  
+      $("#blocos-wrap").append(newBloco);  // adiciona o novo bloco à div #blocos-wrap
+      blocoCount++;  // incrementa o contador de blocos
+    });
+  });
+  </script>
+  
+{% endblock %}
+    

@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block header %}
+<link rel="stylesheet" href="{% static 'simulados/css/simulado.css' %}">
+{% endblock %}
+{% block title %}Cadastro de Simulado{% endblock %}
+
+{% block body %}
+<div class="midde_cont">
+  <div class="container-fluid">
+    <div class="row column_title">
+      <div class="col-md-12">
+          <div class="page_title">
+            <h2>Crie um simulado do seu jeito
+            </h2>
+          </div>
+      </div>
+    </div>
+    {% include 'parcials/_messages.html' %}
+    <div class="container-fluid mt-2">
+
+      
+      <div class="container">
+          <div class="row">
+    
+              <div class="col-md-6" id="div-form">
+                <h3 class="text-primary pt-2 mt-3">Preencha a Questão</h3>
+                  <form action="" method="GET" id="form-adiciona">
+                      <div class="mb-3">
+                        <label class="form-label font-weight-bold text-primary" for="basic-default-company">Selecione as habilidades BNCC da Questão</label><br>
+                        <select name="descritor" class="form-control mt-1 mb-3" id="anos" aria-label="Selecione o Ano">
+                          <option selected value="">Selecione o Ano</option>
+                          {% for a in anos %}
+                            <option value="{{a}}">{{a}}</option>
+                          {% endfor %}              
+                        </select>
+                          {% for h in habilidades %}
+                              <span class="checkbox-option ml-3" data-ano="{{h.ano}}">
+                                  <input class="form-check-input" type="checkbox" value="" id="check_{{h.habilidade}}" name="check_{{h.id}}"  />
+                                  <label class="form-check-label" for="check_{{h.habilidade}}"> {{h.habilidade}}</label><br>
+                                  
+                              </span>
+                          {% endfor %}
+                      </div>
+                      <div class="mb-3">
+                          <label class="form-label font-weight-bold text-primary" for="basic-default-company">Selecione a alternativa correta para a questão</label><br>
+                          <select name="alternativa_correta" id="alternativa_correta" class="form-control">
+                              <option value="">Selecionar</option>
+                              <option value="a">A</option>
+                              <option value="b">B</option>
+                              <option value="c">C</option>
+                              <option value="d">D</option>
+                          </select>
+                      </div>
+                        
+                        <a  class="btn btn-primary" href="#" onclick="AdicionaQuestao()">Adicionar</a>
+                      </form>
+              </div>
+    
+              <div class="col-md-6">
+                  <div class=" py-2">
+                      <div class="container py-4" id="div-simulado-inner">
+                        <h3 class="text-primary">Veja a Prévia do Simulado:</h3>
+          
+          
+                      </div>
+                      <div class="container">
+                        <form action="" method="POST" id="formulario">
+                          {% csrf_token %}
+                          <div class="mb-3">
+                            <label class="form-label" for="basic-default-company">Escreva um Nome para o Simulado</label>
+                            <input type="text" class="form-control" value="" name="nome_simulado" required>
+                          </div>
+                          <button type="submit" class="btn btn-primary">Salvar simulado</button>
+                        </form>
+                      </div>
+                    
+                  </div>
+              </div>
+    
+          </div>
+      </div>
+
+  </div>
+</div>
+
+ 
+
+<script>
+    window.lista_questoes = [];
+    window.contador = 0;
+  function AdicionaQuestao(){
+    
+    
+    
+    //pegando todos os elementos do form que estão marcados
+    var habilidades = "";
+    var checkboxes = document.getElementsByClassName("checkbox-option");
+    for (var i = 0; i < checkboxes.length; i++) {
+      if (checkboxes[i].style.display == "block") {
+        var checkbox = checkboxes[i].getElementsByTagName("input")[0];
+        if (checkbox.checked) {
+          habilidades += checkbox.nextElementSibling.innerHTML + " / ";
+        }
+      }
+    }
+    var alternativa_correta = document.getElementById("alternativa_correta").value;
+
+
+    var par = '<p class="text-primary font-weight-bold">'+(window.contador+1)+' - '+habilidades+ ' - '+alternativa_correta+'</p>';
+
+    //adicionando os inputs hidden com os valores
+    var form_add = document.getElementById("form-adiciona");
+
+    var div = document.getElementById("div-simulado-inner");
+    div.innerHTML += par;
+
+    //limpando o form com id form-adiciona
+    var form = document.getElementById("formulario");
+    var input = document.createElement("input");
+    input.setAttribute("type", "hidden");
+    input.setAttribute("name", "habilidades_"+window.contador);
+    input.setAttribute("value", habilidades);
+    form.appendChild(input);
+
+    var input = document.createElement("input");
+    input.setAttribute("type", "hidden");
+    input.setAttribute("name", "alternativa_correta_"+window.contador);
+    input.setAttribute("value", alternativa_correta);
+    form.appendChild(input);
+
+
+    var checkboxes = document.getElementsByClassName("checkbox-option");
+    for (var i = 0; i < checkboxes.length; i++) {
+      checkboxes[i].style.display = "none";
+    }
+    form_add.reset();
+    window.contador += 1;
+  }
+  window.onload = function() {
+    //escondendo todos os elementos da classe checkbox-option
+    var checkboxes = document.getElementsByClassName("checkbox-option");
+    for (var i = 0; i < checkboxes.length; i++) {
+      checkboxes[i].style.display = "none";
+    }
+
+    //adicionando listener para o select de anos
+    var select = document.getElementById("anos");
+    select.addEventListener("change", function() {
+      var ano = this.value;
+      var checkboxes = document.getElementsByClassName("checkbox-option");
+      for (var i = 0; i < checkboxes.length; i++) {
+        if (checkboxes[i].getAttribute("data-ano") == ano) {
+          checkboxes[i].style.display = "block";
+        } else {
+          checkboxes[i].style.display = "none";
+        }
+      }
+    });
+  }
+</script>
+{% endblock %}
+    

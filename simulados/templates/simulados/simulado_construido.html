@@ -1,0 +1,418 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Construção de Simulado
+{% endblock %}
+
+{% block header %}
+<link rel="stylesheet" href="{% static 'simulados/css/simulado.css' %}">
+{% endblock %}
+
+{% block body %}
+<div class="midde_cont">
+  <div class="container-fluid">
+    <div class="row column_title">
+        <div class="col-md-12">
+            <div class="page_title">
+              <h2>Adicione as questões desejadas
+              </h2>
+            </div>
+        </div>
+    </div>
+    {% include 'parcials/_messages.html' %}
+    <h5 class="">Escolha entre {{qtd_questoes}} Questões
+    </h5>
+    <div class="container-fluid mt-2">
+    
+
+
+        {% include 'parcials/_messages.html' %}
+
+        {%  for q in questoes %}
+          <div class="card-questao my-3">
+              <div class="row">
+                  <div class="col-md-10 px-4 py-2 fwb text-black" id="card_questao_{{q.id}}">
+
+                      <p>
+                          <span class="text-primary">Unidade:</span>
+                          {% for d in q.unidade_tematica.all %}
+                              {{d.unidade}} - {{d.ano}}, 
+                          {% endfor %}
+                      <p>
+                          <span class="text-primary">Questão:</span>
+                          {{q.enunciado}}
+                      </p>
+                      {% if q.suporte_texto %}
+                          <p>
+                              <span class="text-primary">Suporte Texto:</span>
+                              {{q.suporte_texto}}
+                          </p>
+                      {% endif %}
+                      {% if q.suporte_imagem %}
+                          <p>
+                              <img src="{{q.suporte_imagem.url}}" alt="" style="max-height: 100px">
+                          </p>
+                      {% endif %}
+                      <p>
+                          <span class="text-primary">(A):</span>
+                          {% if q.alternativa_a %}
+                            {{q.alternativa_a}}
+                          {% endif %}
+
+                          {% if q.alternativa_a_imagem %}
+                            <img src="{{q.alternativa_a_imagem.url}}" alt="" style="max-height: 100px">
+                          {% endif %}
+                      </p>
+                      <p>
+                          <span class="text-primary">(B):</span>
+                          {% if q.alternativa_b %}
+                            {{q.alternativa_b}}
+                          {% endif %}
+
+                          {% if q.alternativa_b_imagem %}
+                            <img src="{{q.alternativa_b_imagem.url}}" alt="" style="max-height: 100px">
+                          {% endif %}
+                      </p>
+                      <p>
+                          <span class="text-primary">(C):</span>
+                          {% if q.alternativa_c %}
+                            {{q.alternativa_c}}
+                          {% endif %}
+
+                          {% if q.alternativa_c_imagem %}
+                            <img src="{{q.alternativa_c_imagem.url}}" alt="" style="max-height: 100px">
+                          {% endif %}
+                      </p>
+                      <p>
+                          <span class="text-primary">(D):</span>
+                          {% if q.alternativa_d %}
+                            {{q.alternativa_d}}
+                          {% endif %}
+
+                          {% if q.alternativa_d_imagem %}
+                            <img src="{{q.alternativa_d_imagem.url}}" alt="" style="max-height: 100px">
+                          {% endif %}
+                      </p>
+
+                      <p>
+                          <span style="margin-right: 5px"><span class="text-primary">Matriz Referencial:</span> {{q.matriz_referencial}}</span>
+                          <span style="margin-right: 5px"><span class="text-primary">Habilidades ABNCC:</span>
+                              {% for h in q.habilidades_abncc.all %}
+                                  {{h.habilidade}} - {{h.ano}} / 
+                              {% endfor %}
+                          </span>
+                          
+                      </p>
+                  </div>
+                  <div class="col-md-2 card-questao-btn">
+                      <button class="btn btn-primary m-2" onclick="AdicionaQuestao('card_questao_{{q.id}}', '{{q.id}}', 'botao_{{q.id}}')" id="botao_{{q.id}}">
+                          <!-- Ícone de adicionar -->
+                          <i class="bx bx-plus"></i>
+                          adicionar
+                      </button>
+                  </div>
+              </div>
+          </div>
+        {% endfor %}
+
+        <!-- / Navbar -->
+
+        <!-- Content wrapper -->
+        <div class="content-wrapper">
+          <!-- Content -->
+
+          <button class="btn button-simulado button-filtro" id="button-filtro" onclick="Toggle('div-filtro','button-filtro')">
+            <i class="fa fa-filter "></i>
+          </button>
+
+            <div id="div-filtro" >
+                
+                <div class="pb-4 pt-2 px-3" id="">
+                  <h4 class="text-primary pt-4 pb-2">Filtre os Simulados:</h4>
+                  <form action="" method="GET">
+                      <div class="mb-3">
+                        <label class="form-label font-weight-bold text-primary" for="basic-default-company">Unidade Temática</label>
+                        <select name="" id="anos_unidades" class="form-control mt-1" aria-label="Selecione o Ano">
+                          <option selected value="" >Selecione o Ano de Unidade Temática</option>
+                          {% for a in anos_unidades %}
+                            <option value="{{a}}">{{a}}</option>
+                          {% endfor %}   
+                        </select>
+                        <select name="unidade" class="form-control mt-1" id="" aria-label="Selecione a Unidade">
+                          <option selected value="" id="">Selecione a Unidade Temática</option>
+                          {% for d in unidades %}
+                            <option value="{{d.id}}" data-ano="{{d.ano}}"  class="option-unidade">{{d.unidade}}</option>
+                          {% endfor %}      
+                        </select>
+          
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label mb-0 font-weight-bold text-primary" for="basic-default-fullname">Matriz Referencial</label>
+                        <select name="matriz" class="form-control mt-1" id="exampleFormControlSelect1" aria-label="Selecione a Turma">
+                          <option selected value="">Selecione a Matriz</option>
+                          <option value="portugues">Português</option>
+                          <option value="matematica">Matemática</option>                
+                        </select>
+                      </div>
+                      <div class="mb-3">
+                          <div class="mb-3">
+                            <label class="form-label font-weight-bold text-primary" for="basic-default-company">Selecione as habilidades BNCC</label><br>
+                            <select name="" class="form-control mt-1 mb-3" id="anos" aria-label="Selecione o Ano">
+                              <option selected value="">Selecione o Ano</option>
+                              {% for a in anos %}
+                                <option value="{{a}}">{{a}}</option>
+                              {% endfor %}              
+                            </select>
+                              {% for h in habilidades %}
+                                  <span class="checkbox-option ml-3" data-ano="{{h.ano}}">
+                                      <input class="form-check-input" type="checkbox" value="" id="check_{{h.habilidade}}" name="check_{{h.id}}"  />
+                                      <label class="form-check-label" for="check_{{h.habilidade}}"> {{h.habilidade}}</label><br>
+                                      
+                                  </span>
+                              {% endfor %}
+                          </div>
+                      </div>
+                      
+                      <button type="submit" class="btn btn-primary px-4">Filtrar</button>
+                  </form>
+                </div>
+            </div>
+            
+            <!-- Area do questionário e botão flutuante -->
+            <button class="btn button-simulado button-adicionadas" id="button-simulado" onclick="Toggle('div-simulado', 'button-simulado')">
+              <i class="fa fa-file-archive-o"></i>
+            </button>
+            
+            <div class="div-simulado py-2" id="div-simulado">
+                <h4 class="text-primary pt-4 pb-2 px-3">Veja a Prévia do Simulado:</h4>
+                <div class="px-3 pb-4 pt-2" id="div-simulado-inner">
+                  
+
+
+                </div>
+                <div class="px-3">
+                  <form action="" method="POST" id="form-questoes">
+                    {% csrf_token %}
+
+                    {% if request.session.classe == "Coordenador Geral" %}
+                      <div class="mb-3">
+                        <label class="form-label" for="basic-default-company">Defina a Data Limite Para a Aplicação do Simulado</label>
+                        <input type="date" class="form-control" value="" name="data_limite" required>
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label" for="basic-default-company">Informações Adicionais (Opcional)</label>
+                        <textarea class="form-control" name="info_adicionais" id="" cols="30" rows="10"></textarea>
+                      </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                      <label class="form-label" for="basic-default-company">Escreva um Nome para o Simulado</label>
+                      <input type="text" class="form-control" value="" name="nome_simulado" oninput="PreencheQuestoes()" required>
+                    </div>
+
+                    <input type="hidden" id="questoes_simulado" name="questoes_simulado">
+                    <button type="submit" class="btn btn-primary">Salvar simulado</button>
+                    <button type="button" class="btn btn-danger btn-limpar" onclick="LimpaDivSimulado()">Limpar</button>
+                  </form>
+                </div>
+              
+            </div>
+            
+          </div>
+
+        
+
+          <div class="content-backdrop fade"></div>
+        </div>
+        <!-- Content wrapper -->
+
+
+  </div>
+</div>
+
+  <script>
+    function PreencheQuestoes(){
+      //pegando elemento com id questoes_simulado
+      var questoes = document.getElementById("questoes_simulado");
+      var questoes_window = window.questoes_adicionadas;
+
+      //inserindo o questoes_window no questoes
+      questoes.value = JSON.stringify(questoes_window);
+
+      
+    }
+    
+
+    //quando o form-questoes for enviado, chamar a funcao LimpaDivSimulado()
+    document.getElementById("form-questoes").addEventListener("submit", LimpaStorage);
+    
+
+    //adicionando ação de onclick quando clicar no botão flutuante
+    function Toggle(div_id, btn_id) {
+      var width = document.getElementById(div_id).style.width;
+
+      //Verificando o tamanho da tela
+      var width_screen = window.innerWidth;
+
+      //verificando se é maior que 720px
+      if (width_screen > 720){
+        var tamanho_div = "400px";
+        var tamanho_btn = "399px";
+      } else {
+        var tamanho_div = "300px";
+        var tamanho_btn = "299px";
+      }
+
+      //mudando a width do div-simulado
+      if (width == "0px" || width == "") {
+        document.getElementById(div_id).style.width = tamanho_div;
+        document.getElementById(btn_id).style.right = tamanho_btn;
+      } else {
+        document.getElementById(div_id).style.width = "0px";
+        document.getElementById(btn_id).style.right = "-1px";
+      }
+    }
+
+    function AdicionaQuestao(id, id_questao, botao_id){
+      //criando ou pegando dicionário global
+      if (typeof window.questoes_adicionadas === 'undefined') {
+        window.questoes_adicionadas = [];
+      }
+      //adicionando id_questao no dicionário
+      window.questoes_adicionadas.push(id_questao);
+
+      //criando uma versao string do dicionário
+      var questoes = JSON.stringify(window.questoes_adicionadas);
+      //inserindo o valor no  questoes_simulado
+      document.getElementById("questoes_simulado").value = questoes;
+      
+
+
+      //pegando o elemento com id passado e adicionando seu html na div-simulado
+      var questao = document.getElementById(id);
+      var html = questao.outerHTML;
+      //substituindo px-4 por ""
+      html = html.replace("px-4", "");
+      
+      //criando div com classe escalavel-mini
+      var div = document.createElement("div");
+      div.className = "escalavel-mini";
+      div.innerHTML = html;
+
+
+      //adicionando a div criada na div-simulado
+      document.getElementById("div-simulado-inner").appendChild(div);
+      
+      //mudando o texto e cor do botão clicado
+      var button = document.getElementById(botao_id);
+      button.innerHTML = "adicionado";
+      button.className = "btn btn-success";
+      button.disabled = true;
+
+      //pegando html da "div-simulado-inner" e salando no computador do usuário
+      var div_simulado = document.getElementById("div-simulado-inner");
+      var html = div_simulado.innerHTML;
+      //salvando no localStorage
+      localStorage.setItem("div_simulado", html);
+
+      //salvando o dicionário no localStorage
+      localStorage.setItem("questoes_adicionadas", questoes);
+      
+
+    } //fim da função AdicionaQuestao
+
+    function LimpaStorage(){
+      localStorage.removeItem("div_simulado");
+      localStorage.removeItem("questoes_adicionadas");
+      window.questoes_adicionadas = [];
+    }
+
+    function LimpaDivSimulado() {
+      //limpando a div-simulado
+      document.getElementById("div-simulado-inner").innerHTML = "";
+      //limpando o dicionário global
+      window.questoes_adicionadas = [];
+      //limpando o questoes_simulado
+      document.getElementById("questoes_simulado").value = "";
+      //limpando o localStorage
+      localStorage.removeItem("div_simulado");
+      localStorage.removeItem("questoes_adicionadas");
+      //mudando o texto e cor dos botões
+      var buttons = document.getElementsByClassName("btn btn-success");
+      for (var i = 0; i < buttons.length; i++) {
+        var button = buttons[i];
+        button.innerHTML = "adicionar";
+        button.className = "btn btn-primary";
+        button.disabled = false;
+      }
+    }
+
+    //inicializando a div-simulado com o html salvo no localStorage
+    function InicializaDivSimulado(){
+      var html = localStorage.getItem("div_simulado");
+      if (html != null){
+        document.getElementById("div-simulado-inner").innerHTML = html;
+      }
+      var ids =localStorage.getItem("questoes_adicionadas");
+      if (ids != null && ids != ""){
+        //para cada botao_{{q.id}}
+        var ids = JSON.parse(ids);
+        for (var i = 0; i < ids.length; i++) {
+          var id = ids[i];
+          var botao_id = "botao_" + id;
+          var button = document.getElementById(botao_id);
+          button.innerHTML = "adicionado";
+          button.className = "btn btn-success";
+          button.disabled = true;
+        }
+        window.questoes_adicionadas = ids;
+      }else {
+        //criando o questoes_adicionadas
+        localStorage.setItem("questoes_adicionadas", "");
+        window.questoes_adicionadas = [];
+      }
+    }
+
+    
+    window.onload = function() {
+      InicializaDivSimulado();
+      window.lista_excluidos = [];
+    console.log(window.lista_excluidos);
+    //escondendo todos os elementos da classe checkbox-option
+    var checkboxes = document.getElementsByClassName("checkbox-option");
+    for (var i = 0; i < checkboxes.length; i++) {
+      checkboxes[i].style.display = "none";
+    }
+
+    //adicionando listener para o select de anos
+    var select = document.getElementById("anos");
+    select.addEventListener("change", function() {
+      var ano = this.value;
+      var checkboxes = document.getElementsByClassName("checkbox-option");
+      for (var i = 0; i < checkboxes.length; i++) {
+        if (checkboxes[i].getAttribute("data-ano") == ano) {
+          checkboxes[i].style.display = "block";
+        } else {
+          checkboxes[i].style.display = "none";
+        }
+      }
+    });
+
+    var select = document.getElementById("anos_unidades");
+    select.addEventListener("change", function() {
+      var ano = this.value;
+      var options = document.getElementsByClassName("option-unidade");
+      for (var i = 0; i < checkboxes.length; i++) {
+        if (options[i].getAttribute("data-ano") == ano) {
+          options[i].style.display = "block";
+        } else {
+          options[i].style.display = "none";
+        }
+      }
+    });
+  }
+  </script>
+
+{% endblock %}
+    
