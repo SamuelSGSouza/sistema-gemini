@@ -3,6 +3,8 @@ dj-database-url==2.1.0
 Django==4.2.9
 django-debug-toolbar==4.3.0
 django-storages==1.14.2
+gunicorn==22.0.0
+packaging==24.0
 pillow==10.3.0
 psycopg2==2.9.9
 python-dotenv==1.0.1
