@@ -1,0 +1,219 @@
+{% extends 'new_base.html' %}
+{% block title %}Cadastro de Avaliação{% endblock %}
+{% block content %}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+  <div class="row">
+    <div class="col-lg-12 mb-4 order-0">
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center justify-content-between">
+          <h5 class="card-title text-primary">Cadastro de Avaliação </h5>
+        </div>
+        <div class="card-body">
+          {% include 'parcials/_messages.html' %}
+          <form action="" method="POST">
+            {% include 'parcials/_messages.html' %}
+            {% csrf_token %}
+            
+            <div class="mb-3">
+              <label class="form-label" for="NomeAvaliacao">Nome da Avaliação</label>
+              <div class="input-group input-group-merge">
+                <span id="NomeAvaliacaoIcon" class="input-group-text"><i class='bx bxs-file-doc'></i></span>
+                <input
+                  type="text"
+                  name="nome"
+                  class="form-control"
+                  id="NomeAvaliacao"
+                  placeholder=""
+                  aria-label=""
+                  aria-describedby="Nome Avaliacao"
+                  value = "{{nome_avaliacao}}"
+                  required
+                />
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="GrauAvaliacao" class="form-label">Grau de Ensino da Avaliação</label>
+              <select name="grau_ensino" class="form-select" id="GrauAvaliacao" aria-label="Grau da Avaliação">
+                <option selected value="1">1º ano</option>
+                <option value="2">2º ano</option>
+                <option value="3">3º ano</option>
+                <option value="4">4º ano</option>
+                <option value="5">5º ano</option>
+                <option value="6">6º ano</option>
+                <option value="7">7º ano</option>
+                <option value="8">8º ano</option>
+                <option value="9">9º ano</option>
+                <option value="10">1º ano do ensino médio</option>
+                <option value="11">2º ano do ensino médio</option>
+                <option value="12">3º ano do ensino médio</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="MatrizReferencial" class="form-label">Matriz Referencial</label>
+              <select name="matriz_referencial" class="form-select" id="MatrizReferencial" aria-label="Matriz Referencial">
+                <option selected value="Matemática">Matemática</option>
+                <option value="Humanas">Humanas</option>
+                <option value="Linguagens">Linguagens</option>
+                <option value="Ciências">Ciências</option>
+              </select>
+            </div>
+
+            <div class="col-md-12 my-3">
+                
+
+                
+                <div class="row">
+                    <h2 class="text-center my-2" id="TituloAvaliacao"></h2>
+
+                    <div class="col-md-12" id="Questoes">
+
+                    </div>
+
+                    <div class="col-md-9"></div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn rounded-pill btn-outline-primary mb-3 mt-5"
+                            data-bs-toggle="modal" data-bs-target="#modalAdicionaQuestao"
+                        >
+                            <span class="tf-icons bx bx-plus"></span>&nbsp; Questão
+                        </button>
+                    </div>
+
+                </div>
+                
+            </div>
+            <input type="hidden" name="questoes" >
+            <button type="submit" class="btn btn-primary">Cadastrar</button>
+            <!-- ao cancelar redireciona para a página anterior-->
+            <a class="btn btn-secondary mx-2" href="javascript:history.back()">Cancelar</a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalAdicionaQuestao" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-primary" id="modalAdicionaQuestaoTitle">Cadastrar Questão</h5>
+        </div>
+        <div class="modal-body">
+            <form action="" method="POST" id="formQuestao">
+                {% csrf_token %}
+                <div class="mb-3">
+                  <label for="ComponenteCurricular" class="form-label">Componente Currícular</label>
+                  <select name="componente" class="form-select" id="ComponenteCurricular" aria-label="Componente Currícular">
+                    <option selected value="Língua Portuguesa">Língua Portuguesa</option>
+                    <option value="Arte">Arte</option>
+                    <option value="Educação Física">Educação Física</option>
+                    <option value="Inglês">Inglês</option>
+                    <option value="História">História</option>
+                    <option value="Geografia">Geografia</option>
+                    <option value="Ensino Religioso">Ensino Religioso</option>
+                    <option value="Ciências">Ciências</option>
+                    <option value="Matemática">Matemática</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="UnidadeTematica">Unidade Temática</label>
+                    <div class="input-group input-group-merge">
+                      <span id="UnidadeTematicaIcon" class="input-group-text"><i class='bx bx-text'></i></span>
+                      <input type="text" name="unidade_tematica_texto" class="form-control" id="UnidadeTematica" aria-describedby="Unidade Temática" required/>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="HabilidadeABNCC">Habilidade ABNCC</label>
+                    <div class="input-group input-group-merge">
+                      <span id="HabilidadeABNCCIcon" class="input-group-text"><i class='bx bx-text'></i></span>
+                      <input type="text" name="habilidades_abncc_texto" class="form-control" id="HabilidadeABNCC" aria-describedby="Habilidade ABNCC" required/>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="Descritor">Descritor</label>
+                    <div class="input-group input-group-merge">
+                      <span id="DescritorIcon" class="input-group-text"><i class='bx bx-text'></i></span>
+                      <input type="text" name="descritor" class="form-control" id="Descritor" aria-describedby="Descritor" required/>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="AlternativaCorreta" class="form-label">Alternativa Correta</label>
+                    <select name="alternativa_correta" class="form-select" id="AlternativaCorreta" aria-label="Alternativa Correta">
+                        <option selected value="a">A</option>
+                        <option value="b">B</option>
+                        <option value="c">C</option>
+                        <option value="d">D</option>
+                    </select>
+                </div>
+
+
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Cadastrar</button>
+                </div>
+            </form>        
+        </div>
+        
+      </div>
+    </div>
+</div>
+
+<script>
+//oninput no NomeAvaliacao para atualizar o TituloAvaliacao
+document.getElementById("NomeAvaliacao").oninput = function() {
+  document.getElementById("TituloAvaliacao").innerHTML = this.value;
+}
+
+//função para remover questão
+function remove_questao(button) {
+    //removendo a questão do array de questões
+    questoes.splice(button.parentElement, 1);
+    //removendo a questão do html
+    button.parentElement.remove()
+}
+
+var questoes = [];
+//impedindo o envio do formQuestao
+document.getElementById("formQuestao").onsubmit = function() {
+    //salvando os dados do formQuestao como dicionário
+    var questao = {
+        "componente": document.getElementById("ComponenteCurricular").value, // "Matemática
+        "unidade_tematica": document.getElementById("UnidadeTematica").value,
+        "habilidades_abncc": document.getElementById("HabilidadeABNCC").value,
+        "descritor": document.getElementById("Descritor").value,
+        "alternativa_correta": document.getElementById("AlternativaCorreta").value
+    };
+    //adicionando a questão ao array de questões
+    questoes.push(questao);
+
+    //adicionando o array de questões ao input hidden
+    document.querySelector("input[name='questoes']").value = JSON.stringify(questoes);
+
+    //limpando o formQuestao
+    document.getElementById("formQuestao").reset();
+    //adicionando a questão ao html
+    document.getElementById("Questoes").innerHTML += `
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">${questao.componente}</h5>
+                <h5 class="card-title">${questao.unidade_tematica}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">${questao.habilidades_abncc}</h6>
+                <p class="card-text">${questao.descritor}</p>
+                <p class="card-text">Alternativa Correta: ${questao.alternativa_correta}</p>
+                <button type="button" class="btn btn-danger my-2" onclick="remove_questao(this)">Remover</button>
+            </div>
+        </div>
+    `;
+    //fechando o modal
+    document.getElementById("modalAdicionaQuestao").click();
+
+    //impedindo o envio do formQuestao
+    return false;
+}
+</script>
+
+    
+{% endblock %}
+    

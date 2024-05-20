@@ -1,0 +1,46 @@
+{% extends 'new_base.html' %}
+{% load static %}
+{% block title %}Gemini - {{classe}} Dashboard{% endblock %}
+{% block content %}
+<!-- Content -->
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class="row">
+      <div class="col-lg-12 mb-4 order-0">
+        <div class="card mb-4">
+          <div class="card-header d-flex align-items-center justify-content-between">
+            <h5 class="card-title text-primary">Bem Vindo, {{user.first_name}}! </h5>
+            <p class="mb-4">
+              Confira os dados da sua escola:
+            </p>
+          </div>
+          <div class="card-body">
+            <form>
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="basic-default-name">Nome</label>
+                <div class="col-sm-10">
+                  <input  type="text" readonly class="form-control text-primary"value="{{escola.nome}}"  placeholder="{{escola.nome}}" />
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="basic-default-name">Estado</label>
+                <div class="col-sm-10">
+                  <input  type="text" readonly class="form-control text-primary"value="{{escola.estado}}"  placeholder="{{escola.estado}}" />
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="basic-default-name">Municipio</label>
+                <div class="col-sm-10">
+                  <input  type="text" readonly class="form-control text-primary"value="{{escola.municipio}}"  placeholder="{{escola.municipio}}" />
+                </div>
+              </div>
+              
+            </form>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  <!-- / Content -->
+{% endblock %}

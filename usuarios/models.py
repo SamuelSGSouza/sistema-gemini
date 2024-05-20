@@ -1,9 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save, post_delete, pre_save
+from django.db.models.signals import post_delete
 from django.dispatch import receiver
-import re
 from django.core.exceptions import ValidationError
+from simulados import models as simulados_models
 
 ESTADOS = (
         ('AC', 'Acre'),
@@ -82,7 +82,8 @@ def delete_coord_ge(sender, instance, **kwargs):
 class Coordenador(models.Model):
     #definindo o plural name
     class Meta:
-        verbose_name_plural = 'Coordenadores'
+        verbose_name = 'Coordenador de Escola'
+        verbose_name_plural = 'Coordenadores de Escola'
 
     nome_completo = models.CharField(max_length=255)
     cpf = models.CharField(max_length=14, verbose_name='CPF (somente números)', null=True, blank=True)
@@ -110,7 +111,22 @@ class Escola(models.Model):
 
 class Turma(models.Model):
     nome = models.CharField(max_length=100)
+    grau = models.CharField(max_length=100, choices=(
+        ('1', '1º ano'), 
+        ('2', '2º ano'),
+        ('3', '3º ano'), 
+        ('4', '4º ano'), 
+        ('5', '5º ano'),
+        ('6', '6º ano'), 
+        ('7', '7º ano'), 
+        ('8', '8º ano'), 
+        ('9', '9º ano'),
+        ('10', '1º ano do ensino médio'),
+        ('11', '2º ano do ensino médio'),
+        ('12', '3º ano do ensino médio')
+    ), default='1')
     escola = models.ForeignKey(Escola, on_delete=models.CASCADE)
+    simulados_respondidos = models.ManyToManyField(simulados_models.Simulado, blank=True)
     
     def __str__(self):
         return "Turma: " + self.nome + " - Escola: " + self.escola.nome

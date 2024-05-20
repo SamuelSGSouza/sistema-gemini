@@ -16,8 +16,8 @@ class SimuladoAdmin(admin.ModelAdmin):
 
 @admin.register(Questao)
 class QuestaoAdmin(admin.ModelAdmin):
-    list_display = ("matriz_referencial",   )
-    list_filter = ("matriz_referencial",  )
+    list_display = ("habilidades_abncc_texto",   )
+    list_filter = ("habilidades_abncc_texto",  )
     search_fields = ("unidade_tematica", "habilidades_abncc", "nivel_proficiencia", )
 
 @admin.register(Resposta)

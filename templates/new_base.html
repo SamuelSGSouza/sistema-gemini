@@ -150,38 +150,83 @@
               
 
 
-            <li class="menu-header small text-uppercase">
-              <span class="menu-header-text">Turmas</span>
-            </li>
-            <li class="menu-item">
-              <a href="{% url 'coordenador_lista_turmas' %}" class="menu-link">
-                <i class='menu-icon bx bxs-school' ></i>
-                <div data-i18n="Analytics">Listar Turmas</div>
-              </a>
-            </li>
-            <li class="menu-item">
-              <a href="{% url 'coordenador_cadastro_turma' %}" class="menu-link">
-                <i class='menu-icon bx bxs-school' ></i>
-                <div data-i18n="Analytics">Cadastrar Turma</div>
-              </a>
-            </li>
+              <li class="menu-header small text-uppercase">
+                <span class="menu-header-text">Turmas</span>
+              </li>
+              <li class="menu-item">
+                <a href="{% url 'coordenador_lista_turmas' %}" class="menu-link">
+                  <i class='menu-icon bx bxs-school' ></i>
+                  <div data-i18n="Analytics">Listar Turmas</div>
+                </a>
+              </li>
+              <li class="menu-item">
+                <a href="{% url 'coordenador_cadastro_turma' %}" class="menu-link">
+                  <i class='menu-icon bx bxs-school' ></i>
+                  <div data-i18n="Analytics">Cadastrar Turma</div>
+                </a>
+              </li>
+
+              <!-- <li class="menu-header small text-uppercase">
+                <span class="menu-header-text">Professores</span>
+              </li>
+              <li class="menu-item">
+                <a href="{% url 'coordenador_lista_professores' %}" class="menu-link">
+                  <i class='menu-icon bx bxs-graduation'></i>
+                  <div data-i18n="Analytics">Listar Professores</div>
+                </a>
+              </li>
+              <li class="menu-item">
+                <a href="{% url 'coordenador_cadastro_professor' %}" class="menu-link">
+                  <i class='menu-icon bx bxs-graduation'></i>
+                  <div data-i18n="Analytics">Cadastrar Professor</div>
+                </a>
+              </li> -->
+
+            
+            {% endif %}
+
+            {% if request.session.classe == "Coordenador Geral" %}
+              <!-- Dashboard -->
+              <li class="menu-item active">
+                <a href="" class="menu-link">
+                  <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                  <div data-i18n="Analytics">Dashboard</div>
+                </a>
+              </li>
+              
+
+              <li class="menu-header small text-uppercase">
+                <span class="menu-header-text">Avaliações</span>
+              </li>
+              <li class="menu-item">
+                <a href="{% url 'coordenador_lista_avaliacoes' %}" class="menu-link">
+                  <i class='menu-icon bx bxs-file-doc'></i>
+                  <div data-i18n="Analytics">Listar Avaliações</div>
+                </a>
+              </li>
+              <li class="menu-item">
+                <a href="{% url 'coordenador_cadastro_avaliacao' %}" class="menu-link">
+                  <i class='menu-icon bx bxs-file-doc'></i>
+                  <div data-i18n="Analytics">Cadastrar Avaliação</div>
+                </a>
+              </li>
             
 
-            <li class="menu-header small text-uppercase">
-              <span class="menu-header-text">Professores</span>
-            </li>
-            <li class="menu-item">
-              <a href="{% url 'coordenador_lista_professores' %}" class="menu-link">
-                <i class='menu-icon bx bxs-graduation'></i>
-                <div data-i18n="Analytics">Listar Professores</div>
-              </a>
-            </li>
-            <li class="menu-item">
-              <a href="{% url 'coordenador_cadastro_professor' %}" class="menu-link">
-                <i class='menu-icon bx bxs-graduation'></i>
-                <div data-i18n="Analytics">Cadastrar Professor</div>
-              </a>
-            </li>
+              <!-- <li class="menu-header small text-uppercase">
+                <span class="menu-header-text">Professores</span>
+              </li>
+              <li class="menu-item">
+                <a href="{% url 'coordenador_lista_professores' %}" class="menu-link">
+                  <i class='menu-icon bx bxs-graduation'></i>
+                  <div data-i18n="Analytics">Listar Professores</div>
+                </a>
+              </li>
+              <li class="menu-item">
+                <a href="{% url 'coordenador_cadastro_professor' %}" class="menu-link">
+                  <i class='menu-icon bx bxs-graduation'></i>
+                  <div data-i18n="Analytics">Cadastrar Professor</div>
+                </a>
+              </li> -->
 
             
             {% endif %}

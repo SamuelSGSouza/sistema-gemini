@@ -1,7 +1,46 @@
 from django.db import models
-from usuarios.models import Professor
 from django.contrib.auth.models import User
 
+
+COMPONENTES = (
+    ("Língua Portuguesa", "Língua Portuguesa"),
+    ("Arte", "Arte"),
+    ("Educação Física", "Educação Física"),
+    ("Inglês", "Inglês"),
+    ('História', 'História'),
+    ('Geografia', 'Geografia'),
+    ('Ensino Religioso', 'Ensino Religioso'),
+    ('Ciências', 'Ciências'),
+    ('Matemática', 'Matemática'),
+)
+
+MATRIZES_REFERENCIAIS = (
+    ('Matemática', 'Matemática'),
+    ('Humanas', 'Humanas'),
+    ('Linguagens', 'Linguagens'),
+    ('Ciências', 'Ciências')
+)
+GRAUS_ENSINO = (
+    ('1', '1º ano'),
+    ('2', '2º ano'),
+    ('3', '3º ano'),
+    ('4', '4º ano'),
+    ('5', '5º ano'),
+    ('6', '6º ano'),
+    ('7', '7º ano'),
+    ('8', '8º ano'),
+    ('9', '9º ano'),
+    ('10', '1º ano do Ensino Médio'),
+    ('11', '2º ano do Ensino Médio'),
+    ('12', '3º ano do Ensino Médio'),
+)
+
+TIPOS_SIMULADOS = (
+    ("questoes_construidas", "Avaliação Construído"),
+    ("questoes_cadastradas", "Avaliação Cadastrado"),
+    ("questoes_proficiencia", "Avaliação Proficiência"),
+    ("questoes_gerais", "Avaliação Geral")
+)
 
 class UnidadeTematica(models.Model):
     class Meta:
@@ -21,14 +60,11 @@ class HabilidadesBNCC(models.Model):
         return self.habilidade
 
 class Simulado(models.Model):
-    nome = models.CharField(max_length=255, verbose_name='Nome do simulado')
+    nome = models.CharField(max_length=255, verbose_name='Nome de Avaliação')
     responsavel = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='user', blank=True, null=True)
-    tipo_simulado = models.CharField(max_length=255, verbose_name='Tipo do simulado', choices=(
-        ("questoes_construidas", "Simulado Construído"),
-        ("questoes_cadastradas", "Simulado Cadastrado"),
-        ("questoes_proficiencia", "Simulado Proficiência"),
-        ("questoes_gerais", "Simulado Geral")
-    ), null=True, blank=True)
+    tipo_simulado = models.CharField(max_length=255, verbose_name='Tipo de Avaliação', choices=TIPOS_SIMULADOS, null=True, blank=True)
+    grau_ensino = models.CharField(max_length=255, choices=GRAUS_ENSINO, default='1', verbose_name='Grau de Ensino')
+    matriz_referencial = models.CharField(max_length=255, choices=MATRIZES_REFERENCIAIS,default='Matemática',verbose_name='Matriz Referencial')
     estado = models.CharField(max_length=255, verbose_name='Estado', blank=True, null=True)
     data_limite = models.DateField(verbose_name='Data limite', blank=True, null=True)
     info_adicionais = models.TextField(verbose_name='Informações adicionais', blank=True, null=True)
@@ -44,26 +80,22 @@ class QuestaoReferencia(models.Model):
     simulado = models.ForeignKey('simulados.Simulado', on_delete=models.CASCADE, verbose_name='Simulado')
     numero_questao = models.IntegerField(verbose_name='Número da questão')
     questao = models.ForeignKey('simulados.Questao', on_delete=models.CASCADE, verbose_name='Questão')
-    quantidade_respostas_a = models.IntegerField(verbose_name='Quantidade de respostas A', blank=True, null=True)
-    quantidade_respostas_b = models.IntegerField(verbose_name='Quantidade de respostas B', blank=True, null=True)
-    quantidade_respostas_c = models.IntegerField(verbose_name='Quantidade de respostas C', blank=True, null=True)
-    quantidade_respostas_d = models.IntegerField(verbose_name='Quantidade de respostas D', blank=True, null=True)
+    quantidade_respostas_a = models.IntegerField(verbose_name='Quantidade de respostas A', blank=True, null=True, default=0)
+    quantidade_respostas_b = models.IntegerField(verbose_name='Quantidade de respostas B', blank=True, null=True, default=0)
+    quantidade_respostas_c = models.IntegerField(verbose_name='Quantidade de respostas C', blank=True, null=True, default=0)
+    quantidade_respostas_d = models.IntegerField(verbose_name='Quantidade de respostas D', blank=True, null=True, default=0)
     quantidade_respostas_corretas = models.IntegerField(verbose_name='Quantidade de respostas corretas', blank=True, null=True)
 
 class Questao(models.Model):
     class Meta:
         verbose_name = 'Questão'
         verbose_name_plural = 'Questões'
-
-    matriz_referencial = models.CharField(max_length=255, choices=(
-        ('matematica', 'Matemática'),
-        ('portugues', 'Língua Portuguesa'),
-    ),
-    default='matematica',
-    verbose_name='Matriz Referencial')
+    componente = models.CharField(max_length=255, verbose_name='Componente Curricular', choices=COMPONENTES, default='Matemática')
     unidade_tematica = models.ManyToManyField('simulados.UnidadeTematica', verbose_name='Unidade Temática', blank=True, default=None)
-    habilidades_abncc = models.ManyToManyField(HabilidadesBNCC, verbose_name='Habilidades da BNCC',   blank=True, default=None)
+    unidade_tematica_texto = models.TextField(verbose_name='Unidade Temática', null=True, blank=True, default=None)
+    habilidades_abncc = models.ManyToManyField(HabilidadesBNCC, verbose_name='Habilidades da BNCC', blank=True, default=None)
     habilidades_abncc_texto = models.TextField(verbose_name='Objeto do Conhecimento', null=True, blank=True, default=None)
+    descritor = models.TextField(verbose_name='Descritor', blank=True, null=True)
     enunciado = models.TextField(verbose_name='Enunciado', blank=True, null=True)
     alternativa_a = models.TextField( verbose_name='Alternativa A', blank=True, null=True)
     alternativa_a_imagem = models.ImageField(upload_to='alternativa_a_imagem', verbose_name='Alternativa A Imagem', blank=True, null=True)

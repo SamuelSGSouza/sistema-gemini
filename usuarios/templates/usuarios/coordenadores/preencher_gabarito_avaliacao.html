@@ -1,0 +1,79 @@
+{% extends 'new_base.html' %}
+{% load static %}
+{% block title %}Preencher Gabarito da Turma {{turma.nome}}{% endblock %}
+
+{% block content %} 
+
+<div class="container-xxl flex-grow-1 container-p-y">
+  <div class="row">
+    <div class="col-lg-12 mb-4 order-0">
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center justify-content-between">
+          <h3 class="card-title text-primary">Preencher Gabarito da Turma {{turma.nome}}</h3>
+        </div>
+        <div class="card-body">
+          {% include 'parcials/_messages.html' %}
+      
+      <div class="container-fluid pt-5">
+        <form action="" method="POST" class="form" id="form_gabarito">
+            {% csrf_token %}
+            {% for aluno in alunos %}
+            
+            <div class="mb-5">
+                <h4 class="text-primary mb-0 pb-0">{{aluno.nome}}</h4>
+                <hr>
+                <div class="row">
+                    {% for questao in questoes %}
+                        <div class="col-md-2 ">
+                            <label for="resposta_questao_{{questao.id}}" class="mr-1">Questão nº {{questao.numero_questao}}</label>
+                            <select class="form-select" name="resposta_questao_{{questao.id}}_{{aluno.id}}" id="resposta_questao_{{questao.id}}_{{aluno.id}}" aria-label="Default select example">
+                                <option>--</option>
+                                <option value="a">A</option>
+                                <option value="b">B</option>
+                                <option value="c">C</option>
+                                <option value="d">D</option>
+                            </select>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+            </div>
+            
+            {% endfor %}
+
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary">Salvar Gabarito</button>
+            </div>
+        </form>
+      </div>
+        <!-- botão de voltar -->
+        <div class="d-flex justify-content-start">
+          <a href="javascript:history.back()" class="btn btn-secondary">Voltar</a>
+        </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    //antes de enviar, verificar se todas as questões foram respondidas
+    document.getElementById('form_gabarito').addEventListener('submit', function(event){
+        event.preventDefault();
+        let form = this;
+        let respostas = document.querySelectorAll('select');
+        let respostasArray = Array.from(respostas);
+        let respostasVazias = respostasArray.filter(resposta => resposta.value === '--');
+        if(respostasVazias.length > 0){
+            alert('Por favor, preencha todas as questões');
+        }else{
+            form.submit();
+        }
+    });
+</script>
+
+{% endblock %}
+    
+
+    

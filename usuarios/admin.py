@@ -45,6 +45,11 @@ class CoordenadorAdmin(admin.ModelAdmin):
     list_display = ('nome_completo', 'email', 'user', )
     search_fields = ('nome_completo', 'email', 'user', )
 
+@admin.register(CoordenadorGeral)
+class CoordenadorGeralAdmin(admin.ModelAdmin):
+    list_display = ('nome_completo', 'email', 'user', )
+    search_fields = ('nome_completo', 'email', 'user', )
+
 @admin.register(Professor)
 class ProfessorAdmin(admin.ModelAdmin):
     list_display = ('nome_completo', 'email',  'coordenador')
