@@ -647,6 +647,59 @@ class VisualizarAvaliacaoView(CoordenadorGeralBaseView, DetailView):
         context['simulado'] = simulado
         return context
 
+class VisualizarResultadoAvaliacao(CoordenadorGeralBaseView, DetailView):
+    template_name = 'usuarios/coordenadores_gerais/visualizar_resultado_avaliacao.html'
+    model = Simulado
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        simulado = Simulado.objects.get(id=self.kwargs.get('pk'))
+        questoes = QuestaoReferencia.objects.filter(simulado=simulado).order_by('numero_questao')
+        context['questoes'] = questoes
+        context['simulado'] = simulado
+        respostas =  Resposta.objects.filter(questao_referencia__simulado=simulado)
+        context['respostas'] = respostas
+
+        #calculando o percentual de acertos
+        total_questoes = questoes.count()
+        print("total questoes", total_questoes)
+        total_acertos = 0
+        for questao in questoes:
+            total_acertos += questao.quantidade_respostas_corretas
+
+        percentual_acertos = round((total_acertos/respostas.count())*100, 2)
+        context['percentual_acertos'] = percentual_acertos
+        context['total_acertos'] = total_acertos
+        context['total_respostas'] = respostas.count()
+
+        lista_questoes = []
+        for questao in questoes:
+            respostas_questao = respostas.filter(questao_referencia=questao)
+
+            questao_dict = {}
+            questao_dict["numero"] = questao.numero_questao
+            questao_dict["quantidade_respostas"] = respostas_questao.count()
+            questao_dict["quantidade_respostas_corretas"] = questao.quantidade_respostas_corretas
+
+            questoes_por_opcao = [
+                {"letra": "a", "quantidade": questao.quantidade_respostas_a},
+                {"letra": "b", "quantidade": questao.quantidade_respostas_b},
+                {"letra": "c", "quantidade": questao.quantidade_respostas_c},
+                {"letra": "d", "quantidade": questao.quantidade_respostas_d},
+            ]
+            
+            #ordenando as questoes por opcao
+            questoes_por_opcao = sorted(questoes_por_opcao, key=lambda x: x["quantidade"], reverse=True)
+            questao_dict["questoes_por_opcao"] = questoes_por_opcao
+            print(questao_dict)
+            
+            lista_questoes.append(questao_dict)
+        context['lista_questoes'] = lista_questoes[:1]
+        
+        return context
+    
+    
+
 ############# PROFESSOR ################
 class ProfessorView(LoginRequiredMixin):
     login_url = reverse_lazy('login')

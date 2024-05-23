@@ -12,6 +12,10 @@ urlpatterns = [
 
     #coordenadores gerais
     path('coordenador_geral/dashboard', views.DashboardCoordenadorGeral.as_view(), name='home_coordenador_geral'),
+    path('cadastro/simulado', views.CreateAvaliacaoView.as_view(), name='coordenador_cadastro_avaliacao'),
+    path("coordenador_geral/lista/simulados", views.ListaAvaliacoesView.as_view(), name="coordenador_lista_avaliacoes"),
+    path('coordenador_geral/visualizar/resultados/<int:pk>', views.VisualizarResultadoAvaliacao.as_view(), name='coordenador_geral_visualizar_resultados_avaliacao'),
+
     # path('coordenador_geral/cadastro', views.GeralCreateCoordenadorView.as_view(), name='cadastro_coordenador'),
     
     #coordenadores
@@ -20,13 +24,11 @@ urlpatterns = [
     path('lista/professores', views.ListaProfessoresView.as_view(), name='coordenador_lista_professores'),
     path('lista/turmas', views.ListaTurmasView.as_view(), name='coordenador_lista_turmas'),
     path('lista/alunos/<int:pk>', views.ListaAlunosView.as_view(), name='coordenador_lista_alunos'),
-    path("lista/simulados", views.ListaAvaliacoesView.as_view(), name="coordenador_lista_avaliacoes"),
     path("coordenador/lista/simulados_turma/<int:pk>", views.ListaAvaliacoesTurmaView.as_view(), name="coordenador_lista_avaliacoes_turma"),
 
     path('cadastro/professor', views.CreateProfessorView.as_view(), name='coordenador_cadastro_professor'),
     path('cadastro/turma', views.CreateTurmaView.as_view(), name='coordenador_cadastro_turma'),
     path('cadastro/aluno', views.CreateAlunoView.as_view(), name='coordenador_cadastro_aluno'),
-    path('cadastro/simulado', views.CreateAvaliacaoView.as_view(), name='coordenador_cadastro_avaliacao'),
     path('coordenador/cadastro/gabarito/<int:pk>', views.PreencherGabaritoView.as_view(), name='coordenador_cadastro_gabarito'),
     
     path('edita/professor/<int:pk>', views.EditProfessorView.as_view(), name='coordenador_edita_professor'),

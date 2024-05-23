@@ -418,20 +418,22 @@
     profileReportChart.render();
   }
 
+
+function criaChart(id, label_1, label_2, label_3, label_4, data_1, data_2, data_3, data_4){
   // Order Statistics Chart
   // --------------------------------------------------------------------
-  const chartOrderStatistics = document.querySelector('#orderStatisticsChart'),
+  const chartOrderStatistics = document.querySelector('#' + id),
     orderChartConfig = {
       chart: {
         height: 165,
         width: 130,
         type: 'donut'
       },
-      labels: ['Electronic', 'Sports', 'Decor', 'Fashion'],
-      series: [85, 15, 50, 50],
-      colors: [config.colors.primary, config.colors.secondary, config.colors.info, config.colors.success],
+      labels: [label_1, label_2, label_3, label_4],
+      series: [data_1, data_2, data_3, data_4],
+      colors: [config.colors.primary, config.colors.warning, config.colors.warning, config.colors.warning],
       stroke: {
-        width: 5,
+        width: 4,
         colors: cardColor
       },
       dataLabels: {
@@ -487,6 +489,20 @@
     const statisticsChart = new ApexCharts(chartOrderStatistics, orderChartConfig);
     statisticsChart.render();
   }
+}//fim da função criaChart
+
+//esperando 1 seg
+setTimeout(function(){
+  //iterando sobre os elementos da classe questaoGraph
+  let questoes = document.getElementsByClassName('questaoGraph');
+  let i = 0;
+  for (i = 0; i < questoes.length; i++) {
+    let id = questoes[i].id;
+    //iterando sobre os data-
+    let attr = questoes[i].attributes;
+    window.alert(attr);
+  }
+}, 1000);
 
   // Income Chart - Area chart
   // --------------------------------------------------------------------

@@ -1,5 +1,0 @@
-1. Modificar o estilo das páginas
-
-2. Otimizar o tempo de carregamento
-
-3. Permitir que o secretário cadastre escolas
