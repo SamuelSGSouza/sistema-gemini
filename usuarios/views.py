@@ -1,5 +1,7 @@
 from typing import Any
 from django.db.models.query import QuerySet
+from django.http import HttpRequest
+from django.http.response import HttpResponse as HttpResponse
 from django.shortcuts import render, redirect
 from django.views.generic import TemplateView, ListView, DetailView
 from django.contrib.auth import login, logout, authenticate
@@ -9,6 +11,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from simulados.models import *
+from collections import defaultdict
 
 #cordenadores
 class LoginPageView(TemplateView):
@@ -654,6 +657,7 @@ class VisualizarResultadoAvaliacao(CoordenadorGeralBaseView, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         simulado = Simulado.objects.get(id=self.kwargs.get('pk'))
+        self.request.session['simulado_id'] = simulado.id
         questoes = QuestaoReferencia.objects.filter(simulado=simulado).order_by('numero_questao')
         context['questoes'] = questoes
         context['simulado'] = simulado
@@ -661,11 +665,12 @@ class VisualizarResultadoAvaliacao(CoordenadorGeralBaseView, DetailView):
         context['respostas'] = respostas
 
         #calculando o percentual de acertos
-        total_questoes = questoes.count()
-        print("total questoes", total_questoes)
         total_acertos = 0
         for questao in questoes:
-            total_acertos += questao.quantidade_respostas_corretas
+            if questao.quantidade_respostas_corretas:
+                total_acertos += questao.quantidade_respostas_corretas
+            else:
+                total_acertos += 0
 
         percentual_acertos = round((total_acertos/respostas.count())*100, 2)
         context['percentual_acertos'] = percentual_acertos
@@ -679,25 +684,73 @@ class VisualizarResultadoAvaliacao(CoordenadorGeralBaseView, DetailView):
             questao_dict = {}
             questao_dict["numero"] = questao.numero_questao
             questao_dict["quantidade_respostas"] = respostas_questao.count()
-            questao_dict["quantidade_respostas_corretas"] = questao.quantidade_respostas_corretas
-
+            questao_dict["quantidade_respostas_corretas"] = questao.quantidade_respostas_corretas or 0
+            questao_dict["componente"] = questao.questao.componente
+            questao_dict["descritor"] = questao.questao.descritor
+            questao_dict["unidade_tematica"] = questao.questao.unidade_tematica_texto
+            questao_dict["habilidades_abncc"] = questao.questao.habilidades_abncc_texto
             questoes_por_opcao = [
-                {"letra": "a", "quantidade": questao.quantidade_respostas_a},
                 {"letra": "b", "quantidade": questao.quantidade_respostas_b},
                 {"letra": "c", "quantidade": questao.quantidade_respostas_c},
                 {"letra": "d", "quantidade": questao.quantidade_respostas_d},
+                {"letra": "a", "quantidade": questao.quantidade_respostas_a},
+                
+                
+                
             ]
-            
-            #ordenando as questoes por opcao
-            questoes_por_opcao = sorted(questoes_por_opcao, key=lambda x: x["quantidade"], reverse=True)
-            questao_dict["questoes_por_opcao"] = questoes_por_opcao
-            print(questao_dict)
+                        
+            #transformando em dict com label_1, data_1, label_2, data_2
+            questoes_por_opcao_dict = {}
+            for i, opcao in enumerate(questoes_por_opcao):
+                questoes_por_opcao_dict[f"label_{i+1}"] = opcao["letra"]
+                questoes_por_opcao_dict[f"data_{i+1}"] = opcao["quantidade"]
+            questao_dict["questoes_por_opcao"] = questoes_por_opcao_dict
+
+            questao_dict['resposta_correta'] = questao.questao.alternativa_correta
             
             lista_questoes.append(questao_dict)
-        context['lista_questoes'] = lista_questoes[:1]
+        context['lista_questoes'] = lista_questoes
+
+
+        
+
+        # Inicialização do dicionário de escolas
+        escolas = defaultdict(lambda: {"respostas": 0, "acertos": 0, "nome": "", "id": ""})
+        alunos = defaultdict(lambda: {"respostas": 0, "acertos": 0, "nome": "", "id": ""})
+        # Agrupando as questões por escola e calculando a média de acertos simultaneamente
+        for resposta in respostas:
+            escola = resposta.aluno.turma.escola
+            aluno = resposta.aluno
+            escolas[escola]["nome"] = escola.nome
+            escolas[escola]["id"] = escola.id
+            escolas[escola]["respostas"] += 1
+
+            alunos[aluno]["nome"] = aluno.nome
+            alunos[aluno]["id"] = aluno.id
+            alunos[aluno]["respostas"] += 1
+
+            if resposta.acertou:
+                escolas[escola]["acertos"] += 1
+                alunos[aluno]["acertos"] += 1
+        # Calculando percentual de acertos e preparando os dados para ordenação
+        for dados in escolas.values():
+            dados["percentual_acertos"] = round((dados["acertos"] / dados["respostas"]) * 100, 2)
+
+        for dados in alunos.values():
+            dados["percentual_acertos"] = round((dados["acertos"] / dados["respostas"]) * 100, 2)
+
+        # Ordenando por percentual de acertos
+        escolas_ordenadas = dict(sorted(escolas.items(), key=lambda item: item[1]["percentual_acertos"], reverse=True))
+        alunos_ordenados = dict(sorted(alunos.items(), key=lambda item: item[1]["percentual_acertos"], reverse=True))
+
+        #transformando em lista
+        escolas_ordenadas = list(escolas_ordenadas.values())
+        alunos_ordenados = list(alunos_ordenados.values())
+
+        context['escolas'] = escolas_ordenadas
+        context['alunos'] = alunos_ordenados
         
         return context
-    
     
 
 ############# PROFESSOR ################
@@ -804,4 +857,130 @@ class ProfessorEditAlunoView(AlunoView, DetailView):
         messages.success(self.request, 'Aluno editado com sucesso!')
         
         return redirect('home_professor')
-    
+
+
+############# GERAL ################
+class VisualizarResultadoAvaliacaoEscola(TemplateView, LoginRequiredMixin):
+    login_url = reverse_lazy('login')
+    template_name = 'visualizar/resultado_avaliacao_escola.html'
+
+    def get(self, *args, **kwargs):
+        escola_id = self.kwargs.get('pk')
+        simulado_id = self.request.session.get('simulado_id')
+        escola = Escola.objects.get(id=escola_id)
+        simulado = Simulado.objects.get(id=simulado_id)
+        questoes = QuestaoReferencia.objects.filter(simulado=simulado).order_by('numero_questao')
+        respostas = Resposta.objects.filter(questao_referencia__simulado=simulado, aluno__turma__escola=escola)
+        total_acertos = 0
+        for reposta in respostas:
+            if reposta.acertou:
+                total_acertos += 1
+
+        percentual_acertos = round((total_acertos/respostas.count())*100, 2)
+        total_respostas = respostas.count()
+
+        lista_questoes = []
+        for questao in questoes:
+            respostas_questao = respostas.filter(questao_referencia=questao)
+
+            questao_dict = {}
+            questao_dict["numero"] = questao.numero_questao
+            questao_dict["quantidade_respostas"] = respostas_questao.count()
+            questao_dict["quantidade_respostas_corretas"] = respostas_questao.filter(acertou=True).count()
+            questao_dict["componente"] = questao.questao.componente
+            questao_dict["descritor"] = questao.questao.descritor
+            questao_dict["unidade_tematica"] = questao.questao.unidade_tematica_texto
+            questao_dict["habilidades_abncc"] = questao.questao.habilidades_abncc_texto
+
+            questoes_por_opcao = [
+                {"letra": "b", "quantidade": respostas_questao.filter(resposta='b').count()},
+                {"letra": "c", "quantidade": respostas_questao.filter(resposta='c').count()},
+                {"letra": "d", "quantidade": respostas_questao.filter(resposta='d').count()},
+                {"letra": "a", "quantidade": respostas_questao.filter(resposta='a').count()},
+            ]
+            #transformando em dict com label_1, data_1, label_2, data_2
+            questoes_por_opcao_dict = {}
+            for i, opcao in enumerate(questoes_por_opcao):
+                questoes_por_opcao_dict[f"label_{i+1}"] = opcao["letra"]
+                questoes_por_opcao_dict[f"data_{i+1}"] = opcao["quantidade"]
+            questao_dict["questoes_por_opcao"] = questoes_por_opcao_dict
+
+            questao_dict['resposta_correta'] = questao.questao.alternativa_correta
+            lista_questoes.append(questao_dict)
+
+        #alunos
+        alunos = Aluno.objects.filter(turma__escola=escola)
+        alunos_dict = []
+        for aluno in alunos:
+            respostas_aluno = respostas.filter(aluno=aluno)
+            total_acertos_aluno = respostas_aluno.filter(acertou=True).count()
+            if respostas_aluno.count() == 0:
+                percentual_acertos_aluno = 0
+            else:
+                percentual_acertos_aluno = round((total_acertos_aluno/respostas_aluno.count())*100, 2)
+            alunos_dict.append({
+                'nome': aluno.nome,
+                "id": aluno.id,
+                'percentual_acertos': percentual_acertos_aluno,
+                'total_acertos': total_acertos_aluno,
+                'total_respostas': respostas_aluno.count()
+            })
+
+        #ordenando alunos por percentual de acertos
+        alunos_dict = sorted(alunos_dict, key=lambda x: x['percentual_acertos'], reverse=True)
+        
+
+            
+        context = {
+            'questoes': lista_questoes,
+            'simulado': simulado,
+            'percentual_acertos': percentual_acertos,
+            'total_acertos': total_acertos,
+            'total_respostas': total_respostas,
+            'escola': escola,
+            'alunos': alunos_dict
+        }
+        return render(self.request, self.template_name, context)
+
+class VisualizarHistoricoAluno(TemplateView, LoginRequiredMixin):
+    template_name = 'visualizar/historico_aluno.html'
+    login_url = reverse_lazy('login')
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        id_aluno = kwargs.get('pk')
+        aluno = Aluno.objects.get(id=id_aluno)
+
+        #pegando as avaliações que o aluno respondeu
+        respostas = Resposta.objects.filter(aluno=aluno)
+        simulados = []
+        for resposta in respostas:
+            simulado = resposta.questao_referencia.simulado
+            if simulado not in simulados:
+                simulados.append(simulado)
+
+        #contando percentual de acerto por simulado
+        simulados_dict = []
+        for simulado in simulados:
+            respostas_simulado = respostas.filter(questao_referencia__simulado=simulado)
+            total_acertos = respostas_simulado.filter(acertou=True).count()
+            percentual_acertos = round((total_acertos/respostas_simulado.count())*100, 2)
+            simulados_dict.append({
+                'simulado': simulado,
+                'percentual_acertos': percentual_acertos,
+                'total_acertos': total_acertos,
+                'total_respostas': respostas_simulado.count(),
+                'criacao': simulado.criacao
+            })
+
+        #ordenando simulados por data de criação
+        simulados_dict = sorted(simulados_dict, key=lambda x: x['criacao'], reverse=True)
+
+
+        context = {
+            'aluno': aluno,
+            'simulados': simulados_dict
+        }
+        
+        return render(request, self.template_name, context)
+
+

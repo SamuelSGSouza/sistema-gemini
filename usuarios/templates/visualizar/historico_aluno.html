@@ -1,0 +1,105 @@
+{% extends 'new_base.html' %}
+{% load static %}
+{% block title %}Gemini - Histórico do Aluno {% endblock %}
+{% block content %}
+<!-- Content -->
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Histórico /</span> {{aluno.nome}}</h4>
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card mb-4">
+          <h5 class="card-header">Detalhes do Aluno</h5>
+          <!-- Account -->
+          <hr class="my-0" />
+          <div class="card-body">
+            <form id="formAccountSettings" onsubmit="return false">
+              <div class="row">
+                <div class="mb-3 col-md-6">
+                  <label for="firstName" class="form-label">Nome Completo</label>
+                  <input
+                    class="form-control"
+                    type="text"
+                    id="firstName"
+                    value="{{aluno.nome}}"
+                    readonly
+                  />
+                </div>
+                <div class="mb-3 col-md-6">
+                  <label for="lastName" class="form-label">Turma</label>
+                  <input class="form-control" type="text" id="lastName" value="{{aluno.turma.nome}}" readonly/>
+                </div>
+                <div class="mb-3 col-md-6">
+                  <label for="lastName" class="form-label">Escola</label>
+                  <input class="form-control" type="text" id="lastName" value="{{aluno.turma.escola.nome}}" readonly/>
+                </div>
+            </form>
+          </div>
+          <!-- /Account -->
+        </div>
+        <div class="card .card-70">
+          <h5 class="card-header">Histórico do Aluno</h5>
+          <div class="card-body">
+            <div class="mb-3 col-12 mb-0">
+              
+
+              <div class="table-responsive text-nowrap">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>Avaliação</th>
+                      <th>Data de Criação</th>
+                      <th>Percentual de Acerto</th>
+                    </tr>
+                  </thead>
+                  <tbody class="table-border-bottom-0">
+                    {% for av in simulados %}
+                    <tr>
+                      <td><strong>{{av.simulado.nome}}</strong></td>
+                      <td>{{av.criacao}}</td>
+                      <td>
+                        <div class="progress" >
+                          <div
+                            class="progress-bar progress-bar-striped"
+                            role="progressbar"
+                            id="progress_bar_av_{{av.simulado.id}}"
+                            aria-valuenow="{{av.percentual_acertos}}"
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                          >{{av.percentual_acertos}}%</div>
+                          <script>
+    
+                            var progress_bar = document.getElementById("progress_bar_av_{{av.simulado.id}}");
+                            var percentual_acertos = '{{av.percentual_acertos}}';
+                            percentual_acertos = parseFloat(percentual_acertos);
+                            if (percentual_acertos < 50) {
+                              progress_bar.classList.add("bg-danger");
+                            } else if (percentual_acertos < 70) {
+                              progress_bar.classList.add("bg-warning");
+                            } else {
+                              progress_bar.classList.add("bg-success");
+                            }
+                            progress_bar.style.width = percentual_acertos + "%";
+                          </script>
+                        </div>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                    <script>
+    
+                    </script>
+                  </tbody>
+                </table>
+              </div>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- / Content -->
+
+{% endblock %}

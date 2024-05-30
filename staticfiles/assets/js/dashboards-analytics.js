@@ -419,7 +419,33 @@
   }
 
 
-function criaChart(id, label_1, label_2, label_3, label_4, data_1, data_2, data_3, data_4){
+function criaChart(id, label_1, label_2, label_3, label_4, data_1, data_2, data_3, data_4, total_acertos_percent, resposta_correta, original_labels){
+  
+  let percentual = parseInt(total_acertos_percent);
+  let primaryColor;
+  if (percentual <= 25) {
+    primaryColor = config.colors.danger;
+  } else if (percentual > 25 && percentual <= 50) {
+    primaryColor = config.colors.warning;
+  } else if (percentual > 50 && percentual <= 75) {
+    primaryColor = config.colors.info;
+  } else {
+    primaryColor = config.colors.success;
+  }
+
+  let definedLabels = [label_1, label_2, label_3, label_4];
+
+  //definindo a cor do acerto
+  let listaCores = [];
+  for (let i = 0; i < 4; i++) {
+    if (resposta_correta == original_labels[i]) {
+      listaCores.push(primaryColor);
+    }
+    else {
+      listaCores.push(config.colors.secondary);
+    }
+  }
+
   // Order Statistics Chart
   // --------------------------------------------------------------------
   const chartOrderStatistics = document.querySelector('#' + id),
@@ -429,9 +455,9 @@ function criaChart(id, label_1, label_2, label_3, label_4, data_1, data_2, data_
         width: 130,
         type: 'donut'
       },
-      labels: [label_1, label_2, label_3, label_4],
+      labels: definedLabels,
       series: [data_1, data_2, data_3, data_4],
-      colors: [config.colors.primary, config.colors.warning, config.colors.warning, config.colors.warning],
+      colors: listaCores,
       stroke: {
         width: 4,
         colors: cardColor
@@ -475,9 +501,9 @@ function criaChart(id, label_1, label_2, label_3, label_4, data_1, data_2, data_
                 show: true,
                 fontSize: '0.8125rem',
                 color: axisColor,
-                label: 'Weekly',
+                label: 'Acertos',
                 formatter: function (w) {
-                  return '38%';
+                  return total_acertos_percent + '%';
                 }
               }
             }
@@ -496,11 +522,35 @@ setTimeout(function(){
   //iterando sobre os elementos da classe questaoGraph
   let questoes = document.getElementsByClassName('questaoGraph');
   let i = 0;
+
   for (i = 0; i < questoes.length; i++) {
     let id = questoes[i].id;
-    //iterando sobre os data-
-    let attr = questoes[i].attributes;
-    window.alert(attr);
+    //pegando todos os attr com "data-"
+    let dataset = questoes[i].dataset;
+
+    let data_1 = parseInt(dataset['data_1']);
+    let data_2 = parseInt(dataset['data_2']);
+    let data_3 = parseInt(dataset['data_3']);
+    let data_4 = parseInt(dataset['data_4']);
+
+    let data_1_percent = parseInt((data_1 / (data_1 + data_2 + data_3 + data_4)) * 100);
+    let data_2_percent = parseInt((data_2 / (data_1 + data_2 + data_3 + data_4)) * 100);
+    let data_3_percent = parseInt((data_3 / (data_1 + data_2 + data_3 + data_4)) * 100);
+    let data_4_percent = parseInt((data_4 / (data_1 + data_2 + data_3 + data_4)) * 100);
+
+
+    let original_labels = [dataset['label_1'], dataset['label_2'], dataset['label_3'], dataset['label_4']];
+    let label_1 = dataset['label_1']+ " (%)";
+    let label_2 = dataset['label_2']+ " (%)";
+    let label_3 = dataset['label_3']+ " (%)";
+    let label_4 = dataset['label_4']+ " (%)";
+
+    let total_acertos = parseInt(dataset['quantidade_respostas_corretas']);
+    let total_acertos_percent = ((total_acertos / (data_1 + data_2 + data_3 + data_4)) * 100).toFixed(1);
+
+    let resposta_correta = dataset['resposta_correta'];
+
+    criaChart(id, label_1, label_2, label_3, label_4, data_1_percent, data_2_percent, data_3_percent, data_4_percent, total_acertos_percent, resposta_correta, original_labels);
   }
 }, 1000);
 

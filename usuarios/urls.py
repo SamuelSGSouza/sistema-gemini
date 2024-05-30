@@ -42,4 +42,10 @@ urlpatterns = [
     path('professor/lista_alunos', views.ProfessorListView.as_view(), name='home_professor'),
     path('professor/cadastro', views.ProfessorCreateAlunoView.as_view(), name='cadastro_aluno'),
     path('professor/aluno/<int:pk>', views.ProfessorEditAlunoView.as_view(), name='edita_aluno'),
+
+
+
+    #geral VisualizarResultadoAvaliacaoEscola
+    path('geral/visualizar/resultados/<int:pk>', views.VisualizarResultadoAvaliacaoEscola.as_view(), name='geral_visualizar_resultados_avaliacao'),
+    path('geral/visualizar/historico_aluno/<int:pk>', views.VisualizarHistoricoAluno.as_view(), name='geral_visualizar_historico_aluno'),
 ]
