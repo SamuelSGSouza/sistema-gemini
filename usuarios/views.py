@@ -487,7 +487,11 @@ class ListaAvaliacoesTurmaView(CoordenadorBaseView, DetailView):
         grau_turma = self.object.grau
         avaliacoes = Simulado.objects.filter(grau_ensino=grau_turma)
         respondidas = self.object.simulados_respondidos.all()
-        avaliacoes = [avaliacao for avaliacao in avaliacoes if avaliacao not in respondidas]
+        for avaliacao in avaliacoes:
+            if avaliacao in respondidas:
+                avaliacao.respondida = True
+            else:
+                avaliacao.respondida = False
         context['avaliacoes'] = avaliacoes
 
         self.request.session['turma_id'] = self.object.id
@@ -866,7 +870,7 @@ class VisualizarResultadoAvaliacaoEscola(TemplateView, LoginRequiredMixin):
 
     def get(self, *args, **kwargs):
         escola_id = self.kwargs.get('pk')
-        simulado_id = self.request.session.get('simulado_id')
+        simulado_id = self.request.session.get('simulado_id') or self.request.GET.get('simulado_id')
         escola = Escola.objects.get(id=escola_id)
         simulado = Simulado.objects.get(id=simulado_id)
         questoes = QuestaoReferencia.objects.filter(simulado=simulado).order_by('numero_questao')

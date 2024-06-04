@@ -14,9 +14,9 @@
         <div class="card-body">
           {% include 'parcials/_messages.html' %}
       
-      <div class="container-fluid">
+      <div class="container-fluid card-80">
          
-        <div class="table-responsive text-nowrap pb-5 font-weight-bold">
+        <div class="table-responsive text-nowrap pb-5 font-weight-bold ">
           <table class="table table-hover text-center">
             <thead>
               <tr >
@@ -28,15 +28,24 @@
             </thead>
             <tbody class="table-border-bottom-0">
               {% for avaliacao in avaliacoes %}
-                  <tr>
+                  {% if avaliacao.respondida %}
+                  <tr class="table-success">
+                  {% else %}
+                  <tr class="table-danger">
+                  {% endif %}
                     <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>{{avaliacao.nome}}</strong></td>
                     <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>{{avaliacao.get_grau_ensino_display}}</strong></td>
                     <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>{{avaliacao.criacao|date:"d/m/Y"}}</strong></td>
                     <td>
+                      {% if avaliacao.respondida %}
+                        <a class="white-hover" target="_blank" href="{% url 'geral_visualizar_resultados_avaliacao' turma.escola.id %}?simulado_id={{avaliacao.id}}"
+                        title="Ver Resultado da Escola"
+                        ><i class="bx bx-show"></i></a>
+                      {% else %}
                         <a class="white-hover" href="{% url 'coordenador_cadastro_gabarito' avaliacao.id %}"
                         title="Preencher Gabarito"
                         ><i class='bx bxs-add-to-queue'></i></a>
-
+                      {% endif %}
                     </td>
                   </tr>
                 {% endfor %}

@@ -1,5 +1,8 @@
 .card-70{
     max-height: 70vh;
     overflow-y: auto;
-
+}
+.card-80{
+    max-height: 80vh;
+    overflow-y: auto;
 }
