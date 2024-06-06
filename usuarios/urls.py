@@ -11,7 +11,7 @@ urlpatterns = [
     path('secretario/coordenadores/criar', views.CadastroCoordenadorGeral.as_view(), name='cria_coordenadores_geral'),
 
     #coordenadores gerais
-    path('coordenador_geral/dashboard', views.DashboardCoordenadorGeral.as_view(), name='home_coordenador_geral'),
+    path('super_user/dashboard', views.DashboardSuperUser.as_view(), name='home_coordenador_geral'),
     path('cadastro/simulado', views.CreateAvaliacaoView.as_view(), name='coordenador_cadastro_avaliacao'),
     path("coordenador_geral/lista/simulados", views.ListaAvaliacoesView.as_view(), name="coordenador_lista_avaliacoes"),
     path('coordenador_geral/visualizar/resultados/<int:pk>', views.VisualizarResultadoAvaliacao.as_view(), name='coordenador_geral_visualizar_resultados_avaliacao'),

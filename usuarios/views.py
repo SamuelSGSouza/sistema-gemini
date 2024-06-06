@@ -25,12 +25,28 @@ class LoginPageView(TemplateView):
         if user:
             login(self.request, user)
 
+            self.request.session['nome'] = self.request.user.first_name
+            
+            
+
             #verificando se o usuario é secretario
             if Secretario.objects.filter(user=user).exists():
-                return redirect('home_secretario')
+                usuario = Secretario.objects.get(user=user)
+
+                self.request.session['classe'] = "Secretário"
+                self.request.session["geral_id"] = usuario.id
+                self.request.session["rede"] = usuario.rede
+                
+                return redirect('home_coordenador_geral')
             
             #verificando se o usuario é coordenador geral
             elif CoordenadorGeral.objects.filter(user=user).exists():
+                usuario = CoordenadorGeral.objects.get(user=user)
+
+                self.request.session['classe'] = "Coordenador Geral"
+                self.request.session["geral_id"] = usuario.id
+                self.request.session["rede"] = usuario.secretario.rede
+                
                 return redirect('home_coordenador_geral')
 
             elif Coordenador.objects.filter(user=user).exists():
@@ -174,7 +190,7 @@ class CoordenadorGeralView(LoginRequiredMixin):
         return context
 
 class CoordenadorGeralListView(CoordenadorGeralView, ListView):
-    template_name = 'usuarios/coordenadores_gerais/lista_coordenadores.html'
+    template_name = 'usuarios/superuser/lista_coordenadores.html'
     model = Coordenador
     login_url = reverse_lazy('login')
     context_object_name = 'coordenadores'
@@ -188,7 +204,7 @@ class CoordenadorGeralListView(CoordenadorGeralView, ListView):
         return qs
     
 class CoordenadorGeralCreateCoordenadorView(CoordenadorGeralView, TemplateView):
-    template_name = 'usuarios/coordenadores_gerais/cad_coordenador.html'
+    template_name = 'usuarios/superuser/cad_coordenador.html'
 
     def post(self, *args, **kwargs):
         nome = self.request.POST.get('nome')
@@ -490,7 +506,9 @@ class ListaAvaliacoesTurmaView(CoordenadorBaseView, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         grau_turma = self.object.grau
-        avaliacoes = Simulado.objects.filter(grau_ensino=grau_turma)
+        rede = Coordenador.objects.get(user=self.request.user).coordenador_geral.secretario.rede
+        print(rede)
+        avaliacoes = Simulado.objects.filter(grau_ensino=grau_turma, rede=rede)
         respondidas = self.object.simulados_respondidos.all()
         for avaliacao in avaliacoes:
             if avaliacao in respondidas:
@@ -569,28 +587,24 @@ class PreencherGabaritoView(CoordenadorBaseView, DetailView):
 
 
 ############# COORDENADOR GERAL ################
-class CoordenadorGeralBaseView(LoginRequiredMixin):
+class SuperUserGeralBaseView(LoginRequiredMixin):
     login_url = reverse_lazy('login')
 
     #criando redirect para deslogar caso o usuario não seja coordenador
     def dispatch(self, request, *args, **kwargs):
-        if not CoordenadorGeral.objects.filter(user=request.user).exists():
+        if not CoordenadorGeral.objects.filter(user=request.user).exists() and not Secretario.objects.filter(user=request.user).exists():
             logout(request)
             return redirect('login')
         return super().dispatch(request, *args, **kwargs)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
-        self.request.session['nome'] = self.request.user.first_name
-        self.request.session['classe'] = "Coordenador Geral"
-        self.request.session["coordenador_geral_id"] = CoordenadorGeral.objects.get(user=user).id
-        return context
 
-class DashboardCoordenadorGeral(CoordenadorGeralBaseView, TemplateView):
-    template_name = 'usuarios/coordenadores_gerais/dashboard.html'
+class DashboardSuperUser(SuperUserGeralBaseView, TemplateView):
+    template_name = 'usuarios/superuser/dashboard.html'
 
-class ListaAvaliacoesView(CoordenadorGeralBaseView, ListView):
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        return redirect('coordenador_lista_avaliacoes')
+
+class ListaAvaliacoesView(SuperUserGeralBaseView, ListView):
     template_name = 'listar/lista_avaliacao.html'
     model = Simulado
     login_url = reverse_lazy('login')
@@ -600,7 +614,15 @@ class ListaAvaliacoesView(CoordenadorGeralBaseView, ListView):
 
     def get_queryset(self) -> QuerySet[Any]:
         qs = super().get_queryset()
-        qs = qs.filter(responsavel=self.request.user)
+
+        #pegando a rede
+        if CoordenadorGeral.objects.filter(user=self.request.user).exists():
+            rede = CoordenadorGeral.objects.get(user=self.request.user).secretario.rede
+        elif Secretario.objects.filter(user=self.request.user).exists():
+            rede = Secretario.objects.get(user=self.request.user).rede
+        else:
+            rede = None
+        qs = qs.filter(rede = rede)
         return qs
 
     def post(self, *args, **kwargs):
@@ -610,16 +632,21 @@ class ListaAvaliacoesView(CoordenadorGeralBaseView, ListView):
         messages.success(self.request, 'Simulado deletado com sucesso!')
         return redirect('coordenador_lista_avaliacoes')
 
-class CreateAvaliacaoView(CoordenadorGeralBaseView, TemplateView):
+class CreateAvaliacaoView(SuperUserGeralBaseView, TemplateView):
     template_name = 'criar/cria_avaliacao.html'
 
     def post(self, *args, **kwargs):
+
+        rede = CoordenadorGeral.objects.get(user=self.request.user).secretario.rede
+       
+
         simulado = Simulado.objects.create(
             nome=self.request.POST.get('nome'),
             responsavel=self.request.user,
             tipo_simulado="questoes_construidas",
             grau_ensino=self.request.POST.get('grau_ensino'),
             matriz_referencial=self.request.POST.get('matriz_referencial'),
+            rede=rede,
         )
 
         questoes = self.request.POST.get('questoes')
@@ -646,7 +673,7 @@ class CreateAvaliacaoView(CoordenadorGeralBaseView, TemplateView):
         messages.success(self.request, 'Avaliação cadastrada com sucesso!')
         return redirect('coordenador_lista_avaliacoes')
 
-class VisualizarAvaliacaoView(CoordenadorGeralBaseView, DetailView):
+class VisualizarAvaliacaoView(SuperUserGeralBaseView, DetailView):
     template_name = 'visualizar/ver_avaliacao.html'
     model = Simulado
     context_object_name = 'avaliacao'
@@ -659,8 +686,8 @@ class VisualizarAvaliacaoView(CoordenadorGeralBaseView, DetailView):
         context['simulado'] = simulado
         return context
 
-class VisualizarResultadoAvaliacao(CoordenadorGeralBaseView, DetailView):
-    template_name = 'usuarios/coordenadores_gerais/visualizar_resultado_avaliacao.html'
+class VisualizarResultadoAvaliacao(SuperUserGeralBaseView, DetailView):
+    template_name = 'usuarios/superuser/visualizar_resultado_avaliacao.html'
     model = Simulado
 
     def get_context_data(self, **kwargs):
@@ -681,7 +708,11 @@ class VisualizarResultadoAvaliacao(CoordenadorGeralBaseView, DetailView):
             else:
                 total_acertos += 0
 
-        percentual_acertos = round((total_acertos/respostas.count())*100, 2)
+        total_respostas = respostas.count()
+        if total_respostas > 0:
+            percentual_acertos = round((total_acertos/total_respostas)*100, 2)
+        else:
+            percentual_acertos = 0
         context['percentual_acertos'] = percentual_acertos
         context['total_acertos'] = total_acertos
         context['total_respostas'] = respostas.count()

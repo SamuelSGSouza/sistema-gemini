@@ -44,6 +44,7 @@ class Secretario(models.Model):
     endereco = models.CharField(max_length=100, blank=True, null=True)
     municipio = models.CharField(max_length=100, blank=True, null=True)
     estado = models.CharField(max_length=100, choices=ESTADOS)
+    rede = models.CharField(max_length=100, unique=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):

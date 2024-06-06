@@ -13,9 +13,11 @@
         </div>
         <div class="card-body">
           {% include 'parcials/_messages.html' %}
+      {% if request.session.classe == "Coordenador Geral" %}
       <div class="table-responsive text-nowrap">
         <a href="{% url 'coordenador_cadastro_avaliacao' %}" class="btn btn-outline-primary mx-3 my-4">Cadastrar Avaliação</a>
       </div>
+      {% endif %}
       <div class="container-fluid">
          
         <div class="table-responsive text-nowrap pb-5 font-weight-bold">
@@ -41,13 +43,15 @@
                         <a class="white-hover"  href="{% url 'coordenador_geral_visualizar_resultados_avaliacao' avaliacao.id %}"
                         title="Visualizar Resultados"
                         ><i class="bx bx-bar-chart-alt-2 mx-1"></i></a>
-                        
+
+                        {% if request.session.classe == "Coordenador Geral" %}
                         <a class="white-hover text-danger" href=""
                         title="Deletar Avaliação"
                         data-bs-toggle="modal"
                         data-bs-target="#modalCenter"
                         onclick="mudaID('{{avaliacao.id}}', '{{avaliacao.nome}}')"><i class="bx bx-trash mx-1"></i></a
                         >
+                        {% endif %}
 
                     </td>
                   </tr>

@@ -188,14 +188,17 @@
             
             {% endif %}
 
-            {% if request.session.classe == "Coordenador Geral" %}
-              <!-- Dashboard -->
-              <li class="menu-item active">
-                <a href="" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-home-circle"></i>
-                  <div data-i18n="Analytics">Dashboard</div>
-                </a>
-              </li>
+            {% if request.session.classe == "Coordenador Geral" or request.session.classe == "Secretário" %}
+              
+              {% if request.session.classe == "Coordenador Geral" %}
+                <!-- Dashboard -->
+                  <li class="menu-item active">
+                    <a href="" class="menu-link">
+                      <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                      <div data-i18n="Analytics">Dashboard</div>
+                    </a>
+                  </li>
+              {% endif %}
               
 
               <li class="menu-header small text-uppercase">
@@ -207,12 +210,12 @@
                   <div data-i18n="Analytics">Listar Avaliações</div>
                 </a>
               </li>
-              <li class="menu-item">
+              <!-- <li class="menu-item">
                 <a href="{% url 'coordenador_cadastro_avaliacao' %}" class="menu-link">
                   <i class='menu-icon bx bxs-file-doc'></i>
                   <div data-i18n="Analytics">Cadastrar Avaliação</div>
                 </a>
-              </li>
+              </li> -->
             
 
               <!-- <li class="menu-header small text-uppercase">
@@ -287,8 +290,8 @@
                             </div>
                           </div>
                           <div class="flex-grow-1">
-                            <span class="fw-semibold d-block">{{user.first_name}} {{user.last_name}}</span>
-                            <small class="text-muted">{{self.request.session.classe}}</small>
+                            <span class="fw-semibold d-block">{{user.username}} </span>
+                            <small class="text-muted">{{request.session.classe}}</small>
                           </div>
                         </div>
                       </a>
@@ -347,26 +350,10 @@
                   <script>
                     document.write(new Date().getFullYear());
                   </script>
-                  , made with ❤️ by
-                  <a href="https://themeselection.com" target="_blank" class="footer-link fw-bolder">ThemeSelection</a>
+                  , Sistema Gemini
                 </div>
                 <div>
-                  <a href="https://themeselection.com/license/" class="footer-link me-4" target="_blank">License</a>
-                  <a href="https://themeselection.com/" target="_blank" class="footer-link me-4">More Themes</a>
-
-                  <a
-                    href="https://themeselection.com/demo/sneat-bootstrap-html-admin-template/documentation/"
-                    target="_blank"
-                    class="footer-link me-4"
-                    >Documentation</a
-                  >
-
-                  <a
-                    href="https://github.com/themeselection/sneat-html-admin-template-free/issues"
-                    target="_blank"
-                    class="footer-link me-4"
-                    >Support</a
-                  >
+                  
                 </div>
               </div>
             </footer>

@@ -69,6 +69,7 @@ class Simulado(models.Model):
     data_limite = models.DateField(verbose_name='Data limite', blank=True, null=True)
     info_adicionais = models.TextField(verbose_name='Informações adicionais', blank=True, null=True)
     media_acertos = models.FloatField(verbose_name='Média de acertos', blank=True, null=True)
+    rede = models.CharField(max_length=255, verbose_name='Rede', blank=True, null=True)
     criacao = models.DateTimeField(auto_now_add=True, verbose_name='Data de criação')
     
 
