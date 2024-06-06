@@ -39,6 +39,11 @@ class LoginPageView(TemplateView):
             elif Professor.objects.filter(user=user).exists():
                 return redirect('home_professor')
             
+            else:
+                messages.error(self.request, 'Usuário ou senha incorretos')
+                logout(self.request)
+                return redirect('login')
+            
                 
         else:
             messages.error(self.request, 'Usuário ou senha incorretos')
