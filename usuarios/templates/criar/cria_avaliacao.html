@@ -117,18 +117,24 @@
                   </select>
                 </div>
                 <div class="mb-3">
+                    
                     <label class="form-label" for="UnidadeTematica">Unidade Temática</label>
-                    <div class="input-group input-group-merge">
-                      <span id="UnidadeTematicaIcon" class="input-group-text"><i class='bx bx-text'></i></span>
-                      <input type="text" name="unidade_tematica_texto" class="form-control" id="UnidadeTematica" aria-describedby="Unidade Temática" required/>
-                    </div>
+                    <select name="unidade_tematica_texto" class="form-select" id="UnidadeTematica" aria-describedby="Unidade Temática">
+                      <option value="" selected disabled>Selecione uma Unidade Temática</option>
+                      {% for unidade in unidades %}
+                          <option value="{{unidade}}">{{unidade}}</option>
+                      {% endfor %}
+                    </select>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label" for="HabilidadeABNCC">Habilidade ABNCC</label>
-                    <div class="input-group input-group-merge">
-                      <span id="HabilidadeABNCCIcon" class="input-group-text"><i class='bx bx-text'></i></span>
-                      <input type="text" name="habilidades_abncc_texto" class="form-control" id="HabilidadeABNCC" aria-describedby="Habilidade ABNCC" required/>
-                    </div>
+                    
+                    <label class="form-label" for="HabilidadeABNCC">Habilidade BNCC</label>
+                    <select name="" id="HabilidadeBNCC"class="form-select" name="habilidades_abncc_texto" aria-describedby="Habilidade ABNCC">
+                      <option value="" selected disabled>Selecione uma habilidade</option>
+                      {% for habilidade in habilidades_bncc %}
+                          <option value="{{habilidade}}">{{habilidade}}</option>
+                      {% endfor %}
+                    </select>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="Descritor">Descritor</label>
@@ -181,7 +187,7 @@ document.getElementById("formQuestao").onsubmit = function() {
     var questao = {
         "componente": document.getElementById("ComponenteCurricular").value, // "Matemática
         "unidade_tematica": document.getElementById("UnidadeTematica").value,
-        "habilidades_abncc": document.getElementById("HabilidadeABNCC").value,
+        "habilidades_abncc": document.getElementById("HabilidadeBNCC").value,
         "descritor": document.getElementById("Descritor").value,
         "alternativa_correta": document.getElementById("AlternativaCorreta").value
     };

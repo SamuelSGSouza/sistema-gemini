@@ -47,14 +47,14 @@ class UnidadeTematica(models.Model):
         verbose_name = 'Unidade Temática'
         verbose_name_plural = 'Unidades Temáticas'
     unidade = models.CharField(max_length=255, verbose_name='Unidade Temática')
-    ano = models.CharField(max_length=255,verbose_name='Ano', blank=True, null=True)
+    ano = models.CharField(max_length=255,verbose_name='Ano', blank=True, null=True,choices=GRAUS_ENSINO)
 
     def __str__(self):
         return self.unidade
 
 class HabilidadesBNCC(models.Model):
     habilidade = models.CharField(max_length=255, verbose_name='Habilidade da BNCC')
-    ano = models.CharField(max_length=255,verbose_name='Ano', blank=True, null=True)
+    ano = models.CharField(max_length=255,verbose_name='Ano', blank=True, null=True, choices=GRAUS_ENSINO)
 
     def __str__(self):
         return self.habilidade

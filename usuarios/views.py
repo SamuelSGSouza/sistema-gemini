@@ -635,6 +635,16 @@ class ListaAvaliacoesView(SuperUserGeralBaseView, ListView):
 class CreateAvaliacaoView(SuperUserGeralBaseView, TemplateView):
     template_name = 'criar/cria_avaliacao.html'
 
+    def get(self, *args, **kwargs):
+        #pegando a lista de habilidade da HabilidadesBNCC
+        habilidades_bncc = list(HabilidadesBNCC.objects.all().values_list('habilidade', flat=True))
+        unidades = list(UnidadeTematica.objects.all().values_list('unidade', flat=True))
+        context = {
+            'habilidades_bncc': habilidades_bncc,
+            'unidades': unidades
+        }
+        return render(self.request, self.template_name, context)
+
     def post(self, *args, **kwargs):
 
         rede = CoordenadorGeral.objects.get(user=self.request.user).secretario.rede
@@ -756,10 +766,12 @@ class VisualizarResultadoAvaliacao(SuperUserGeralBaseView, DetailView):
 
         # Inicialização do dicionário de escolas
         escolas = defaultdict(lambda: {"respostas": 0, "acertos": 0, "nome": "", "id": ""})
+        turmas = defaultdict(lambda: {"respostas": 0, "acertos": 0, "nome": "", "id": "", "escola": "", "pontuacao_media":""})
         alunos = defaultdict(lambda: {"respostas": 0, "acertos": 0, "nome": "", "id": ""})
         # Agrupando as questões por escola e calculando a média de acertos simultaneamente
         for resposta in respostas:
             escola = resposta.aluno.turma.escola
+            turma = resposta.aluno.turma
             aluno = resposta.aluno
             escolas[escola]["nome"] = escola.nome
             escolas[escola]["id"] = escola.id
@@ -769,9 +781,16 @@ class VisualizarResultadoAvaliacao(SuperUserGeralBaseView, DetailView):
             alunos[aluno]["id"] = aluno.id
             alunos[aluno]["respostas"] += 1
 
+            turmas[turma]["nome"] = turma.nome
+            turmas[turma]["id"] = turma.id
+            turmas[turma]["respostas"] += 1
+            turmas[turma]["escola"] = escola.nome
+
             if resposta.acertou:
                 escolas[escola]["acertos"] += 1
                 alunos[aluno]["acertos"] += 1
+                turmas[turma]["acertos"] += 1
+
         # Calculando percentual de acertos e preparando os dados para ordenação
         for dados in escolas.values():
             dados["percentual_acertos"] = round((dados["acertos"] / dados["respostas"]) * 100, 2)
@@ -779,16 +798,34 @@ class VisualizarResultadoAvaliacao(SuperUserGeralBaseView, DetailView):
         for dados in alunos.values():
             dados["percentual_acertos"] = round((dados["acertos"] / dados["respostas"]) * 100, 2)
 
+        for dados in turmas.values():
+            dados["percentual_acertos"] = round((dados["acertos"] / dados["respostas"]) * 100, 2)
+            dados["pontuacao_media"] = round((dados["acertos"] / dados["respostas"]) * 10, 2)
+        
+        #inserindo situacao turma
+        for turma in turmas.values():
+            if turma["percentual_acertos"] < 26:
+                turma["situacao"] = "Abaixo do Básico"
+            elif turma["percentual_acertos"] < 51:
+                turma["situacao"] = "Básico"
+            elif turma["percentual_acertos"] < 76:
+                turma["situacao"] = "Adequado"
+            else:
+                turma["situacao"] = "Avançado"
+
         # Ordenando por percentual de acertos
         escolas_ordenadas = dict(sorted(escolas.items(), key=lambda item: item[1]["percentual_acertos"], reverse=True))
         alunos_ordenados = dict(sorted(alunos.items(), key=lambda item: item[1]["percentual_acertos"], reverse=True))
+        turmas_ordenadas = dict(sorted(turmas.items(), key=lambda item: item[1]["percentual_acertos"], reverse=True))
 
         #transformando em lista
         escolas_ordenadas = list(escolas_ordenadas.values())
         alunos_ordenados = list(alunos_ordenados.values())
+        turmas_ordenadas = list(turmas_ordenadas.values())
 
         context['escolas'] = escolas_ordenadas
         context['alunos'] = alunos_ordenados
+        context['turmas'] = turmas_ordenadas
         
         return context
     
@@ -958,12 +995,27 @@ class VisualizarResultadoAvaliacaoEscola(TemplateView, LoginRequiredMixin):
                 percentual_acertos_aluno = 0
             else:
                 percentual_acertos_aluno = round((total_acertos_aluno/respostas_aluno.count())*100, 2)
+            
+            pontuacao_aluno = round(percentual_acertos_aluno/10, 1)
+
+            #definindo a situacao do aluno
+            if percentual_acertos_aluno < 26:
+                situacao_aluno = "Abaixo do Básico"
+            elif percentual_acertos_aluno < 51:
+                situacao_aluno = "Básico"
+            elif percentual_acertos_aluno < 76:
+                situacao_aluno = "Adequado"
+            else:
+                situacao_aluno = "Avançado"
+
             alunos_dict.append({
                 'nome': aluno.nome,
                 "id": aluno.id,
                 'percentual_acertos': percentual_acertos_aluno,
                 'total_acertos': total_acertos_aluno,
-                'total_respostas': respostas_aluno.count()
+                'total_respostas': respostas_aluno.count(),
+                'pontuacao': pontuacao_aluno,
+                'situacao': situacao_aluno 
             })
 
         #ordenando alunos por percentual de acertos
@@ -981,6 +1033,104 @@ class VisualizarResultadoAvaliacaoEscola(TemplateView, LoginRequiredMixin):
             'alunos': alunos_dict
         }
         return render(self.request, self.template_name, context)
+
+class VisualizarResultadoAvaliacaoTurma(TemplateView, LoginRequiredMixin):
+    login_url = reverse_lazy('login')
+    template_name = 'visualizar/resultado_avaliacao_turma.html'
+
+    def get(self, *args, **kwargs):
+        turma_id = self.kwargs.get('pk')
+        simulado_id = self.request.session.get('simulado_id') or self.request.GET.get('simulado_id')
+        turma = Turma.objects.get(id=turma_id)
+        simulado = Simulado.objects.get(id=simulado_id)
+        questoes = QuestaoReferencia.objects.filter(simulado=simulado).order_by('numero_questao')
+        respostas = Resposta.objects.filter(questao_referencia__simulado=simulado, aluno__turma=turma)
+        total_acertos = 0
+        for reposta in respostas:
+            if reposta.acertou:
+                total_acertos += 1
+
+        percentual_acertos = round((total_acertos/respostas.count())*100, 2)
+        total_respostas = respostas.count()
+
+        lista_questoes = []
+        for questao in questoes:
+            respostas_questao = respostas.filter(questao_referencia=questao)
+
+            questao_dict = {}
+            questao_dict["numero"] = questao.numero_questao
+            questao_dict["quantidade_respostas"] = respostas_questao.count()
+            questao_dict["quantidade_respostas_corretas"] = respostas_questao.filter(acertou=True).count()
+            questao_dict["componente"] = questao.questao.componente
+            questao_dict["descritor"] = questao.questao.descritor
+            questao_dict["unidade_tematica"] = questao.questao.unidade_tematica_texto
+            questao_dict["habilidades_abncc"] = questao.questao.habilidades_abncc_texto
+
+            questoes_por_opcao = [
+                {"letra": "b", "quantidade": respostas_questao.filter(resposta='b').count()},
+                {"letra": "c", "quantidade": respostas_questao.filter(resposta='c').count()},
+                {"letra": "d", "quantidade": respostas_questao.filter(resposta='d').count()},
+                {"letra": "a", "quantidade": respostas_questao.filter(resposta='a').count()},
+            ]
+            #transformando em dict com label_1, data_1, label_2, data_2
+            questoes_por_opcao_dict = {}
+            for i, opcao in enumerate(questoes_por_opcao):
+                questoes_por_opcao_dict[f"label_{i+1}"] = opcao["letra"]
+                questoes_por_opcao_dict[f"data_{i+1}"] = opcao["quantidade"]
+            questao_dict["questoes_por_opcao"] = questoes_por_opcao_dict
+
+            questao_dict['resposta_correta'] = questao.questao.alternativa_correta
+            lista_questoes.append(questao_dict)
+
+        #alunos
+        alunos = Aluno.objects.filter(turma=turma)
+        alunos_dict = []
+
+        for aluno in alunos:
+            respostas_aluno = respostas.filter(aluno=aluno)
+            total_acertos_aluno = respostas_aluno.filter(acertou=True).count()
+            if respostas_aluno.count() == 0:
+                percentual_acertos_aluno = 0
+            else:
+                percentual_acertos_aluno = round((total_acertos_aluno/respostas_aluno.count())*100, 2)
+            
+            pontuacao_aluno = round(percentual_acertos_aluno/10, 1)
+
+            #definindo a situacao do aluno
+            if percentual_acertos_aluno < 26:
+                situacao_aluno = "Abaixo do Básico"
+            elif percentual_acertos_aluno < 51:
+                situacao_aluno = "Básico"
+            elif percentual_acertos_aluno < 76:
+                situacao_aluno = "Adequado"
+            else:
+                situacao_aluno = "Avançado"
+
+            alunos_dict.append({
+                'nome': aluno.nome,
+                "id": aluno.id,
+                'percentual_acertos': percentual_acertos_aluno,
+                'total_acertos': total_acertos_aluno,
+                'total_respostas': respostas_aluno.count(),
+                'pontuacao': pontuacao_aluno,
+                'situacao': situacao_aluno 
+            })
+
+        #ordenando alunos por percentual de acertos
+        alunos_dict = sorted(alunos_dict, key=lambda x: x['percentual_acertos'], reverse=True)
+        
+
+            
+        context = {
+            'questoes': lista_questoes,
+            'simulado': simulado,
+            'percentual_acertos': percentual_acertos,
+            'total_acertos': total_acertos,
+            'total_respostas': total_respostas,
+            'alunos': alunos_dict,
+            'turma': turma
+        }
+        return render(self.request, self.template_name, context)  
 
 class VisualizarHistoricoAluno(TemplateView, LoginRequiredMixin):
     template_name = 'visualizar/historico_aluno.html'

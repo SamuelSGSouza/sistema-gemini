@@ -47,5 +47,6 @@ urlpatterns = [
 
     #geral VisualizarResultadoAvaliacaoEscola
     path('geral/visualizar/resultados/<int:pk>', views.VisualizarResultadoAvaliacaoEscola.as_view(), name='geral_visualizar_resultados_avaliacao'),
+    path('geral/visualizar/resultados_turma/<int:pk>', views.VisualizarResultadoAvaliacaoTurma.as_view(), name='geral_visualizar_resultados_avaliacao_turma'),
     path('geral/visualizar/historico_aluno/<int:pk>', views.VisualizarHistoricoAluno.as_view(), name='geral_visualizar_historico_aluno'),
 ]

@@ -285,6 +285,89 @@
         </div>
         <!--/ Striped Rows -->
       </div>
+
+
+      <div class="col-md-12 pt-4">
+        <!-- Striped Rows -->
+        <div class="card card-70">
+          <h5 class="card-header">Resultados Por Turma</h5>
+          <div class="table-responsive text-nowrap">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Turma</th>
+                  <th>Escola</th>
+                  <th>Percentual Acerto Médio</th>
+                  <th>Pontuação Média</th>
+                  <th>Situação da Turma</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody class="table-border-bottom-0">
+                {% for turma in turmas %}
+                <tr>
+                  <td><strong>{{turma.nome}}</strong></td>
+                  <td><strong>{{turma.escola}}</strong></td>
+                  <td>
+                    <div class="progress" >
+                      <div
+                        class="progress-bar progress-bar-striped"
+                        role="progressbar"
+                        id="progress_bar_{{turma.id}}"
+                        aria-valuenow="{{turma.percentual_acertos}}"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                      >{{turma.percentual_acertos}}%</div>
+                      <script>
+
+                        var progress_bar = document.getElementById("progress_bar_{{turma.id}}");
+                        var percentual_acertos = '{{turma.percentual_acertos}}';
+                        percentual_acertos = parseFloat(percentual_acertos);
+                        if (percentual_acertos < 50) {
+                          progress_bar.classList.add("bg-danger");
+                        } else if (percentual_acertos < 70) {
+                          progress_bar.classList.add("bg-warning");
+                        } else {
+                          progress_bar.classList.add("bg-success");
+                        }
+                        progress_bar.style.width = percentual_acertos + "%";
+                      </script>
+                    </div>
+                  </td>
+                  <td>
+                    {{turma.pontuacao_media}}
+                  </td>
+                  <td>
+                    {% if turma.situacao == "Abaixo do Básico" %}
+                    <span class="badge bg-danger">
+                      {% elif turma.situacao == "Básico" %}
+                          <span class="badge bg-warning">
+                      {% elif turma.situacao == "Adequado" %}
+                          <span class="badge bg-primary">
+                      {% elif turma.situacao == "Avançado" %}
+                          <span class="badge bg-success">
+                      {% endif %}
+                      {{turma.situacao}}
+                    </span>
+                  </td>
+                  <td>
+                    <a class="white-hover" target="_blank" href="{% url 'geral_visualizar_resultados_avaliacao_turma' turma.id %}"
+                    title="Ver Resultado da Escola"
+                    ><i class="bx bx-show"></i></a>
+
+                  </td>
+                </tr>
+                {% endfor %}
+                <script>
+
+                </script>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!--/ Striped Rows -->
+      </div>
+
     </div>
     
 </div>
