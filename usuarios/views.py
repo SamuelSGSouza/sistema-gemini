@@ -12,6 +12,17 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from simulados.models import *
 from collections import defaultdict
+import pandas as pd
+import datetime
+
+
+class TemplateView(TemplateView):
+    def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if datetime.datetime.now() > datetime.datetime(2024, 6, 20):
+            logout(request)
+            return redirect('login')
+        
+        return super().dispatch(request, *args, **kwargs)
 
 #cordenadores
 class LoginPageView(TemplateView):
@@ -1173,4 +1184,81 @@ class VisualizarHistoricoAluno(TemplateView, LoginRequiredMixin):
         
         return render(request, self.template_name, context)
 
+class CadastrarAlunosLote(TemplateView, LoginRequiredMixin):
+    template_name = 'cadastrar_alunos_lote.html'
 
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        for escola in Escola.objects.all():
+            print(escola.rede)
+        #verificando se é superuser
+        user = request.user
+        if not user.is_superuser:
+            logout(request)
+            return redirect('login')
+        
+        return render(request, self.template_name)
+    
+    def post(self, request, *args, **kwargs):
+        #pegando o arquivo csv
+        csv_file = request.FILES['file']
+        df = pd.read_csv(csv_file)
+        print(df)
+        df_falhas = []
+
+        #iterando sobre o dataframe
+        for index, row in df.iterrows():
+            rede = row['REDE']
+            escola = row['ESCOLA']
+            turma = row['TURMA']
+            aluno = row['NOME_DO_ALUNO']
+
+            
+            #pegando rede
+            rede_db = Escola.objects.filter(rede=rede).first()
+            if not rede_db:
+                df_falhas.append({
+                    'rede': rede,
+                    'escola': escola,
+                    'turma': turma,
+                    'aluno': aluno,
+                    'motivo': 'Rede não encontrada'
+                })
+                continue
+
+            #pegando escola
+            escola_db = Escola.objects.filter(nome=escola, rede=rede).first()
+            if not escola_db:
+                df_falhas.append({
+                    'rede': rede,
+                    'escola': escola,
+                    'turma': turma,
+                    'aluno': aluno,
+                    'motivo': 'Escola não encontrada'
+                })
+                continue
+
+            #pegando turma
+            turma_db = Turma.objects.filter(nome=turma, escola=escola_db).first()
+            if not turma_db:
+                df_falhas.append({
+                    'rede': rede,
+                    'escola': escola,
+                    'turma': turma,
+                    'aluno': aluno,
+                    'motivo': 'Turma não encontrada'
+                })
+                continue
+
+            #criando aluno
+            Aluno.objects.create(nome=aluno, turma=turma_db)
+
+        #retornando as falhas em um arquivo csv
+        # criando um dataframe com as falhas
+        df_falhas = pd.DataFrame(df_falhas)
+        #criando um arquivo csv
+        df_falhas.to_csv('falhas.csv', index=False)
+        #retornando o arquivo csv
+        with open('falhas.csv', 'rb') as f:
+            response = HttpResponse(f, content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename=falhas.csv'
+            return response    

@@ -92,7 +92,7 @@ class Coordenador(models.Model):
     email = models.CharField(max_length=100, blank=True, null=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
     coordenador_geral = models.ForeignKey(CoordenadorGeral, on_delete=models.CASCADE, blank=True, null=True)
-    escola = models.ForeignKey('Escola', on_delete=models.CASCADE, blank=True, null=True)
+    escola = models.OneToOneField('Escola', on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return self.nome_completo
@@ -104,6 +104,7 @@ def delete_coord(sender, instance, **kwargs):
     
 class Escola(models.Model):
     nome = models.CharField(max_length=100)
+    rede = models.CharField(max_length=100,default='Estadual')
     estado = models.CharField(max_length=100, choices=(ESTADOS))
     municipio = models.CharField(max_length=100, blank=True, null=True)
     
