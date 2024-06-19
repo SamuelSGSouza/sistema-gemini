@@ -38,7 +38,7 @@
                     <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>{{avaliacao.criacao|date:"d/m/Y"}}</strong></td>
                     <td>
                       {% if avaliacao.respondida %}
-                        <a class="white-hover" target="_blank" href="{% url 'geral_visualizar_resultados_avaliacao' turma.escola.id %}?simulado_id={{avaliacao.id}}"
+                        <a class="white-hover" target="_blank" href="{% url 'geral_visualizar_resultados_avaliacao_turma' turma.id %}?simulado_id={{avaliacao.id}}"
                         title="Ver Resultado da Escola"
                         ><i class="bx bx-show"></i></a>
                       {% else %}
