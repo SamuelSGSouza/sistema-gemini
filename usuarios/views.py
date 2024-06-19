@@ -24,7 +24,6 @@ class TemplateView(TemplateView):
         
         return super().dispatch(request, *args, **kwargs)
 
-#cordenadores
 class LoginPageView(TemplateView):
     template_name = 'base_login.html'
 
@@ -52,6 +51,7 @@ class LoginPageView(TemplateView):
             
             #verificando se o usuario é coordenador geral
             elif CoordenadorGeral.objects.filter(user=user).exists():
+                print("coordenador geral")
                 usuario = CoordenadorGeral.objects.get(user=user)
 
                 self.request.session['classe'] = "Coordenador Geral"
@@ -61,10 +61,8 @@ class LoginPageView(TemplateView):
                 return redirect('home_coordenador_geral')
 
             elif Coordenador.objects.filter(user=user).exists():
+                print("coordenador")
                 return redirect('home_coordenador')
-            
-            elif Professor.objects.filter(user=user).exists():
-                return redirect('home_professor')
             
             else:
                 messages.error(self.request, 'Usuário ou senha incorretos')
@@ -78,13 +76,41 @@ class LoginPageView(TemplateView):
         
     def get(self, *args, **kwargs):
         if self.request.user.is_authenticated:
-            email = self.request.user.username
-            #verificando se o usuario é coordenador
-            if Coordenador.objects.filter(email=email).exists():
+            user = self.request.user
+            self.request.session['nome'] = self.request.user.first_name
+            
+            
+
+            #verificando se o usuario é secretario
+            if Secretario.objects.filter(user=user).exists():
+                usuario = Secretario.objects.get(user=user)
+
+                self.request.session['classe'] = "Secretário"
+                self.request.session["geral_id"] = usuario.id
+                self.request.session["rede"] = usuario.rede
+                
+                return redirect('home_coordenador_geral')
+            
+            #verificando se o usuario é coordenador geral
+            elif CoordenadorGeral.objects.filter(user=user).exists():
+                print("coordenador geral")
+                usuario = CoordenadorGeral.objects.get(user=user)
+
+                self.request.session['classe'] = "Coordenador Geral"
+                self.request.session["geral_id"] = usuario.id
+                self.request.session["rede"] = usuario.secretario.rede
+                
+                return redirect('home_coordenador_geral')
+
+            elif Coordenador.objects.filter(user=user).exists():
+                print("coordenador")
                 return redirect('home_coordenador')
             
+            
             else:
-                return redirect('home_professor')
+                messages.error(self.request, 'Usuário ou senha incorretos')
+                logout(self.request)
+                return redirect('login')
         return render(self.request, self.template_name)
     
 def logout_view(request):
@@ -95,12 +121,18 @@ def logout_view(request):
 class SecretarioView(LoginRequiredMixin):
     login_url = reverse_lazy('login')
 
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        self.request.session['nome'] = str(Secretario.objects.get(user=self.request.user).nome_completo).split(" ")[0]
+        secretario = Secretario.objects.filter(user=self.request.user)
+        if not secretario.exists():
+            return context
+        secretario = secretario.first()
+
+        self.request.session['nome'] = str(secretario.nome_completo).split(" ")[0]
         self.request.session['classe'] = "Secretário"
-        self.request.session["secretario_id"] = Secretario.objects.get(user=self.request.user).id
-        self.request.session["estado"] = Secretario.objects.get(user=self.request.user).estado
+        self.request.session["secretario_id"] = secretario.id
+        self.request.session["estado"] = secretario.estado
         return context
 
 class ListarEscolas(SecretarioView, ListView):
@@ -193,11 +225,17 @@ class CadastroCoordenadorGeral(SecretarioView, TemplateView):
 class CoordenadorGeralView(LoginRequiredMixin):
     login_url = reverse_lazy('login')
 
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        self.request.session['nome'] = str(CoordenadorGeral.objects.get(user=self.request.user).nome_completo).split(" ")[0]
+        coordenador_geral = CoordenadorGeral.objects.filter(user=self.request.user)
+        if not coordenador_geral.exists():
+            return context
+        
+        coordenador_geral = coordenador_geral.first()
+        self.request.session['nome'] = str(coordenador_geral.nome_completo).split(" ")[0]
         self.request.session['classe'] = "Coordenador Geral"
-        self.request.session["coordenador_id"] = CoordenadorGeral.objects.get(user=self.request.user).id
+        self.request.session["coordenador_id"] = coordenador_geral.id
         return context
 
 class CoordenadorGeralListView(CoordenadorGeralView, ListView):
@@ -271,16 +309,14 @@ class CoordenadorGeralCreateCoordenadorView(CoordenadorGeralView, TemplateView):
 class CoordenadorBaseView(LoginRequiredMixin):
     login_url = reverse_lazy('login')
 
-    #criando redirect para deslogar caso o usuario não seja coordenador
-    def dispatch(self, request, *args, **kwargs):
-        if not Coordenador.objects.filter(user=request.user).exists():
-            logout(request)
-            return redirect('login')
-        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
+        coordenador = Coordenador.objects.filter(user=user)
+        if not coordenador.exists():
+            return context
+        
         self.request.session['nome'] = self.request.user.first_name
         self.request.session['classe'] = "Coordenador"
         self.request.session["coordenador_id"] = Coordenador.objects.get(user=user).id
@@ -849,7 +885,10 @@ class ProfessorView(LoginRequiredMixin):
         context = super().get_context_data(**kwargs)
          
 
-        professor = Professor.objects.get(user=self.request.user)
+        professor = Professor.objects.filter(user=self.request.user)
+        if not professor.exists():
+            return context
+        
         coordenador = professor.coordenador
         escola = Escola.objects.get(Coordenador=coordenador)
         turmas = escola.turmas
@@ -886,7 +925,9 @@ class ProfessorListView(AlunoView, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         turmas = []
-        professor = Professor.objects.get(user=self.request.user)
+        professor = Professor.objects.filter(user=self.request.user)
+        if not professor.exists():
+            return context
         coordenador = professor.coordenador
         escola = Escola.objects.get(Coordenador=coordenador)
         turmas = escola.turmas

@@ -1,1 +1,14 @@
-Criar forma de baixar o resultado
+A - Na tela de cadastrar o simulado quando aparecer o popup de questão, aparecer as somente os componentes curriculares da respectiva matéria
+A - Aparecer somente as habilidades bncc do ano que foi selecionado
+A - Cadastrar descritor como selecionável
+A - Retirar tabela de resultado por escola
+A - No resultado por aluno, adicionar informações de escola e turma
+A - Criar dashboard para usuários
+A - Adicionar campo de "bimestre" na hora de criar a avaliação
+A - Adicionar "Objeto do conhecimento" na hora de cadastrar a questão
+
+C - Na tela do coordenador da escola estão aparecendo todos os alunos
+C - Corrigir cores no percentual de acerto médio por turma e no percentual de acerto médio por aluno
+C - Colocar a habilidade bncc na tela de resultados que não está aparecendo
+C - Corrigir falha na hora de deletar simulado
+
