@@ -199,10 +199,12 @@
                         var progress_bar = document.getElementById("progress_bar_aluno_{{aluno.id}}");
                         var percentual_acertos = '{{aluno.percentual_acertos}}';
                         percentual_acertos = parseFloat(percentual_acertos);
-                        if (percentual_acertos < 50) {
+                        if (percentual_acertos <= 25) {
                           progress_bar.classList.add("bg-danger");
-                        } else if (percentual_acertos < 70) {
+                        } else if (percentual_acertos <= 50) {
                           progress_bar.classList.add("bg-warning");
+                        } else if (percentual_acertos <= 75) {
+                          progress_bar.classList.add("bg-primary");
                         } else {
                           progress_bar.classList.add("bg-success");
                         }

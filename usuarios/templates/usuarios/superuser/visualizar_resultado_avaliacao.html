@@ -163,69 +163,9 @@
     </div>
 
     <div class="row">
-      <div class="col-md-6">
-        <!-- Striped Rows -->
-        <div class="card card-70">
-          <h5 class="card-header">Resultados Por Escola</h5>
-          <div class="table-responsive text-nowrap">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>Escola</th>
-                  <th>Percentual de Acerto</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody class="table-border-bottom-0">
-                {% for escola in escolas %}
-                <tr>
-                  <td><strong>{{escola.nome}}</strong></td>
-                  <td>
-                    <div class="progress" >
-                      <div
-                        class="progress-bar progress-bar-striped"
-                        role="progressbar"
-                        id="progress_bar_{{escola.id}}"
-                        aria-valuenow="{{escola.percentual_acertos}}"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                      >{{escola.percentual_acertos}}%</div>
-                      <script>
-
-                        var progress_bar = document.getElementById("progress_bar_{{escola.id}}");
-                        var percentual_acertos = '{{escola.percentual_acertos}}';
-                        percentual_acertos = parseFloat(percentual_acertos);
-                        if (percentual_acertos < 50) {
-                          progress_bar.classList.add("bg-danger");
-                        } else if (percentual_acertos < 70) {
-                          progress_bar.classList.add("bg-warning");
-                        } else {
-                          progress_bar.classList.add("bg-success");
-                        }
-                        progress_bar.style.width = percentual_acertos + "%";
-                      </script>
-                    </div>
-                  </td>
-                  <td>
-                    <a class="white-hover" target="_blank" href="{% url 'geral_visualizar_resultados_avaliacao' escola.id %}"
-                    title="Ver Resultado da Escola"
-                    ><i class="bx bx-show"></i></a>
-
-                  </td>
-                </tr>
-                {% endfor %}
-                <script>
-
-                </script>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <!--/ Striped Rows -->
-      </div>
 
 
-      <div class="col-md-6">
+      <div class="col-md-12">
         <!-- Striped Rows -->
         <div class="card card-70">
           <h5 class="card-header">Resultados Por Aluno</h5>
@@ -257,10 +197,12 @@
                         var progress_bar = document.getElementById("progress_bar_aluno_{{aluno.id}}");
                         var percentual_acertos = '{{aluno.percentual_acertos}}';
                         percentual_acertos = parseFloat(percentual_acertos);
-                        if (percentual_acertos < 50) {
+                        if (percentual_acertos <= 25) {
                           progress_bar.classList.add("bg-danger");
-                        } else if (percentual_acertos < 70) {
+                        } else if (percentual_acertos <= 50) {
                           progress_bar.classList.add("bg-warning");
+                        } else if (percentual_acertos <= 75) {
+                          progress_bar.classList.add("bg-primary");
                         } else {
                           progress_bar.classList.add("bg-success");
                         }
@@ -323,10 +265,12 @@
                         var progress_bar = document.getElementById("progress_bar_{{turma.id}}");
                         var percentual_acertos = '{{turma.percentual_acertos}}';
                         percentual_acertos = parseFloat(percentual_acertos);
-                        if (percentual_acertos < 50) {
+                        if (percentual_acertos <= 25) {
                           progress_bar.classList.add("bg-danger");
-                        } else if (percentual_acertos < 70) {
+                        } else if (percentual_acertos <= 50) {
                           progress_bar.classList.add("bg-warning");
+                        } else if (percentual_acertos <= 75) {
+                          progress_bar.classList.add("bg-primary");
                         } else {
                           progress_bar.classList.add("bg-success");
                         }

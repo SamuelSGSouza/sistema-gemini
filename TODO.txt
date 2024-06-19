@@ -7,8 +7,3 @@ A - Criar dashboard para usuários
 A - Adicionar campo de "bimestre" na hora de criar a avaliação
 A - Adicionar "Objeto do conhecimento" na hora de cadastrar a questão
 
-C - Na tela do coordenador da escola estão aparecendo todos os alunos
-C - Corrigir cores no percentual de acerto médio por turma e no percentual de acerto médio por aluno
-C - Colocar a habilidade bncc na tela de resultados que não está aparecendo
-C - Corrigir falha na hora de deletar simulado
-
