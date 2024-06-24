@@ -18,7 +18,7 @@ import datetime
 
 class TemplateView(TemplateView):
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if datetime.datetime.now() > datetime.datetime(2024, 6, 20):
+        if datetime.datetime.now() > datetime.datetime(2024, 6, 28):
             logout(request)
             return redirect('login')
         
