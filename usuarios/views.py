@@ -18,7 +18,7 @@ import datetime
 
 class TemplateView(TemplateView):
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if datetime.datetime.now() > datetime.datetime(2024, 6, 28):
+        if datetime.datetime.now() > datetime.datetime(2024, 7, 5):
             logout(request)
             return redirect('login')
         
@@ -1242,7 +1242,9 @@ class CadastrarAlunosLote(TemplateView, LoginRequiredMixin):
     def post(self, request, *args, **kwargs):
         #pegando o arquivo csv
         csv_file = request.FILES['file']
-        df = pd.read_csv(csv_file)
+
+
+        df = pd.read_csv(csv_file, sep=";")
         print(df)
         df_falhas = []
 
