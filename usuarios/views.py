@@ -643,13 +643,148 @@ class SuperUserGeralBaseView(LoginRequiredMixin):
             logout(request)
             return redirect('login')
         return super().dispatch(request, *args, **kwargs)
-
+    
 
 class DashboardSuperUser(SuperUserGeralBaseView, TemplateView):
     template_name = 'usuarios/superuser/dashboard.html'
+    model = Simulado
 
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        return redirect('coordenador_lista_avaliacoes')
+    def get_context_data(self, **kwargs):
+
+        #pegando a rede
+        if CoordenadorGeral.objects.filter(user=self.request.user).exists():
+            coordenador_geral = CoordenadorGeral.objects.get(user=self.request.user)
+            rede = coordenador_geral.secretario.rede
+        else:
+            rede = Secretario.objects.get(user=self.request.user).rede
+
+        #pegando os simulados da rede
+        simulados = Simulado.objects.filter(responsavel__secretario__rede=rede)
+        context = super().get_context_data(**kwargs)
+        questoes = QuestaoReferencia.objects.filter(simulado__in=simulados)
+        context['questoes'] = questoes
+        respostas =  Resposta.objects.filter(questao_referencia__simulado__in=simulados)
+        context['respostas'] = respostas
+
+        #calculando o percentual de acertos
+        total_acertos = 0
+        for questao in questoes:
+            if questao.quantidade_respostas_corretas:
+                total_acertos += questao.quantidade_respostas_corretas
+            else:
+                total_acertos += 0
+
+        total_respostas = respostas.count()
+        if total_respostas > 0:
+            percentual_acertos = round((total_acertos/total_respostas)*100, 2)
+        else:
+            percentual_acertos = 0
+        context['percentual_acertos'] = percentual_acertos
+        context['total_acertos'] = total_acertos
+        context['total_respostas'] = respostas.count()
+
+        lista_questoes = []
+        for questao in questoes:
+            respostas_questao = respostas.filter(questao_referencia=questao)
+
+            questao_dict = {}
+            questao_dict["numero"] = questao.numero_questao
+            questao_dict["quantidade_respostas"] = respostas_questao.count()
+            questao_dict["quantidade_respostas_corretas"] = questao.quantidade_respostas_corretas or 0
+            questao_dict["componente"] = questao.questao.componente
+            questao_dict["descritor"] = questao.questao.descritor
+            questao_dict["unidade_tematica"] = questao.questao.unidade_tematica_texto
+            questao_dict["habilidades_abncc"] = questao.questao.habilidades_abncc_texto
+            questoes_por_opcao = [
+                {"letra": "b", "quantidade": questao.quantidade_respostas_b},
+                {"letra": "c", "quantidade": questao.quantidade_respostas_c},
+                {"letra": "d", "quantidade": questao.quantidade_respostas_d},
+                {"letra": "a", "quantidade": questao.quantidade_respostas_a},
+                
+                
+                
+            ]
+                        
+            #transformando em dict com label_1, data_1, label_2, data_2
+            questoes_por_opcao_dict = {}
+            for i, opcao in enumerate(questoes_por_opcao):
+                questoes_por_opcao_dict[f"label_{i+1}"] = opcao["letra"]
+                questoes_por_opcao_dict[f"data_{i+1}"] = opcao["quantidade"]
+            questao_dict["questoes_por_opcao"] = questoes_por_opcao_dict
+
+            questao_dict['resposta_correta'] = questao.questao.alternativa_correta
+            
+            lista_questoes.append(questao_dict)
+        context['lista_questoes'] = lista_questoes
+
+
+        
+
+        # Inicialização do dicionário de escolas
+        escolas = defaultdict(lambda: {"respostas": 0, "acertos": 0, "nome": "", "id": ""})
+        turmas = defaultdict(lambda: {"respostas": 0, "acertos": 0, "nome": "", "id": "", "escola": "", "pontuacao_media":""})
+        alunos = defaultdict(lambda: {"respostas": 0, "acertos": 0, "nome": "", "id": ""})
+        # Agrupando as questões por escola e calculando a média de acertos simultaneamente
+        for resposta in respostas:
+            escola = resposta.aluno.turma.escola
+            turma = resposta.aluno.turma
+            aluno = resposta.aluno
+            escolas[escola]["nome"] = escola.nome
+            escolas[escola]["id"] = escola.id
+            escolas[escola]["respostas"] += 1
+
+            alunos[aluno]["nome"] = aluno.nome
+            alunos[aluno]["id"] = aluno.id
+            alunos[aluno]["respostas"] += 1
+
+            turmas[turma]["nome"] = turma.nome
+            turmas[turma]["id"] = turma.id
+            turmas[turma]["respostas"] += 1
+            turmas[turma]["escola"] = escola.nome
+
+            if resposta.acertou:
+                escolas[escola]["acertos"] += 1
+                alunos[aluno]["acertos"] += 1
+                turmas[turma]["acertos"] += 1
+
+        # Calculando percentual de acertos e preparando os dados para ordenação
+        for dados in escolas.values():
+            dados["percentual_acertos"] = round((dados["acertos"] / dados["respostas"]) * 100, 2)
+
+        for dados in alunos.values():
+            dados["percentual_acertos"] = round((dados["acertos"] / dados["respostas"]) * 100, 2)
+
+        for dados in turmas.values():
+            dados["percentual_acertos"] = round((dados["acertos"] / dados["respostas"]) * 100, 2)
+            dados["pontuacao_media"] = round((dados["acertos"] / dados["respostas"]) * 10, 2)
+        
+        #inserindo situacao turma
+        for turma in turmas.values():
+            if turma["percentual_acertos"] < 26:
+                turma["situacao"] = "Abaixo do Básico"
+            elif turma["percentual_acertos"] < 51:
+                turma["situacao"] = "Básico"
+            elif turma["percentual_acertos"] < 76:
+                turma["situacao"] = "Adequado"
+            else:
+                turma["situacao"] = "Avançado"
+
+        # Ordenando por percentual de acertos
+        escolas_ordenadas = dict(sorted(escolas.items(), key=lambda item: item[1]["percentual_acertos"], reverse=True))
+        alunos_ordenados = dict(sorted(alunos.items(), key=lambda item: item[1]["percentual_acertos"], reverse=True))
+        turmas_ordenadas = dict(sorted(turmas.items(), key=lambda item: item[1]["percentual_acertos"], reverse=True))
+
+        #transformando em lista
+        escolas_ordenadas = list(escolas_ordenadas.values())
+        alunos_ordenados = list(alunos_ordenados.values())
+        turmas_ordenadas = list(turmas_ordenadas.values())
+
+        context['escolas'] = escolas_ordenadas
+        context['alunos'] = alunos_ordenados
+        context['turmas'] = turmas_ordenadas
+        
+        return context
+    
 
 class ListaAvaliacoesView(SuperUserGeralBaseView, ListView):
     template_name = 'listar/lista_avaliacao.html'
@@ -686,9 +821,11 @@ class CreateAvaliacaoView(SuperUserGeralBaseView, TemplateView):
         #pegando a lista de habilidade da HabilidadesBNCC
         habilidades_bncc = list(HabilidadesBNCC.objects.all().values_list('habilidade', flat=True))
         unidades = list(UnidadeTematica.objects.all().values_list('unidade', flat=True))
+        descritores = list(Descritor.objects.all().values_list('descritor', flat=True))
         context = {
             'habilidades_bncc': habilidades_bncc,
-            'unidades': unidades
+            'unidades': unidades,
+            'descritores': descritores
         }
         return render(self.request, self.template_name, context)
 
@@ -1245,7 +1382,6 @@ class CadastrarAlunosLote(TemplateView, LoginRequiredMixin):
 
 
         df = pd.read_csv(csv_file, sep=";")
-        print(df)
         df_falhas = []
 
         #iterando sobre o dataframe

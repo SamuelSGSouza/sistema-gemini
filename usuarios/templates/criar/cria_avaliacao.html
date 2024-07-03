@@ -138,10 +138,12 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="Descritor">Descritor</label>
-                    <div class="input-group input-group-merge">
-                      <span id="DescritorIcon" class="input-group-text"><i class='bx bx-text'></i></span>
-                      <input type="text" name="descritor" class="form-control" id="Descritor" aria-describedby="Descritor" required/>
-                    </div>
+                    <select name="" id="Descritor"class="form-select" name="descritor" aria-describedby="Descritor">
+                      <option value="" selected disabled>Selecione uma habilidade</option>
+                      {% for descritor in descritores %}
+                          <option value="{{descritor}}">{{descritor}}</option>
+                      {% endfor %}
+                    </select>
                 </div>
                 
                 <div class="mb-3">

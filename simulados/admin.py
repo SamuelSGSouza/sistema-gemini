@@ -24,3 +24,8 @@ class QuestaoAdmin(admin.ModelAdmin):
 class RespostaAdmin(admin.ModelAdmin):
     list_display = ("resposta",)
     list_filter = ("resposta",)
+
+@admin.register(Descritor)
+class DescritorAdmin(admin.ModelAdmin):
+    list_display = ("descritor",)
+    list_filter = ("descritor",)

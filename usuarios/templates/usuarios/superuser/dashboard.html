@@ -1,46 +1,230 @@
 {% extends 'new_base.html' %}
 {% load static %}
-{% block title %}Gemini - {{request.session.classe}} Dashboard{% endblock %}
+{% block title %}Gemini - Resultados Avaliação {% endblock %}
 {% block content %}
-<!-- Content -->
 
+<!-- Content -->
 <div class="container-xxl flex-grow-1 container-p-y">
     <div class="row">
-      <div class="col-lg-12 mb-4 order-0">
-        <div class="card mb-4">
-          <div class="card-header d-flex align-items-center justify-content-between">
-            <h5 class="card-title text-primary">Bem Vindo, {{user.username}}! </h5>
-            <p class="mb-4">
-              Confira os dados da sua escola:
-            </p>
-          </div>
-          <div class="card-body">
-            <form>
-              <div class="row mb-3">
-                <label class="col-sm-2 col-form-label" for="basic-default-name">Nome</label>
-                <div class="col-sm-10">
-                  <input  type="text" readonly class="form-control text-primary"value="{{escola.nome}}"  placeholder="{{escola.nome}}" />
-                </div>
+      <div class="col-lg-8 mb-4 order-0">
+        <div class="card">
+          <div class="d-flex align-items-end row">
+            <div class="col-sm-7">
+              <div class="card-body">
+                <h5 class="card-title text-primary">Resultado geral da rede em todas as disciplinas</h5>
+                <p class="mb-4">
+                  A rede teve um total de acerto de <span class="fw-bold">{{percentual_acertos}}%</span> considerando as áreas do conhecimento.
+                </p>
+
               </div>
-              <div class="row mb-3">
-                <label class="col-sm-2 col-form-label" for="basic-default-name">Estado</label>
-                <div class="col-sm-10">
-                  <input  type="text" readonly class="form-control text-primary"value="{{escola.estado}}"  placeholder="{{escola.estado}}" />
-                </div>
+            </div>
+            <div class="col-sm-5 text-center text-sm-left">
+              <div class="card-body pb-0 px-0 px-md-4">
+                <img
+                  src="{% static 'assets/img/illustrations/man-with-laptop-light.png' %}"
+                  height="140"
+                  alt="View Badge User"
+                  data-app-dark-img="illustrations/man-with-laptop-dark.png"
+                  data-app-light-img="illustrations/man-with-laptop-light.png"
+                />
               </div>
-              <div class="row mb-3">
-                <label class="col-sm-2 col-form-label" for="basic-default-name">Municipio</label>
-                <div class="col-sm-10">
-                  <input  type="text" readonly class="form-control text-primary"value="{{escola.municipio}}"  placeholder="{{escola.municipio}}" />
-                </div>
-              </div>
-              
-            </form>
+            </div>
           </div>
         </div>
       </div>
-      
+      <div class="col-lg-4 col-md-4 order-1">
+        <div class="row">
+          <div class="col-lg-6 col-md-12 col-6 mb-4">
+            <div class="card">
+              <div class="card-body">
+                <div class="card-title d-flex align-items-start justify-content-between">
+                  <div class="avatar flex-shrink-0">
+                    <img
+                      src="{% static 'assets/img/icons/unicons/chart-success.png' %}"
+                      alt="chart success"
+                      class="rounded"
+                    />
+                  </div>
+                </div>
+                <span class="fw-semibold d-block mb-1">Total acertos</span>
+                <h3 class="card-title mb-2">{{total_acertos}}</h3>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-12 col-6 mb-4">
+            <div class="card">
+              <div class="card-body">
+                <div class="card-title d-flex align-items-start justify-content-between">
+                  <div class="avatar flex-shrink-0">
+                    <img
+                      src="{% static 'assets/img/icons/unicons/chart-success.png' %}"
+                      alt="chart success"
+                      class="rounded"
+                    />
+                  </div>
+                </div>
+                <span class="fw-semibold d-block mb-1">Respostas</span>
+                <h3 class="card-title mb-2">{{total_respostas}}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-  <!-- / Content -->
+
+
+    <div class="row">
+
+
+      <div class="col-md-12">
+        <!-- Striped Rows -->
+        <div class="card card-70">
+          <h5 class="card-header">Resultados Por Aluno</h5>
+          <div class="table-responsive text-nowrap">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Aluno</th>
+                  <th>Percentual de Acerto</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody class="table-border-bottom-0">
+                {% for aluno in alunos %}
+                <tr>
+                  <td><strong>{{aluno.nome}}</strong></td>
+                  <td>
+                    <div class="progress" >
+                      <div
+                        class="progress-bar progress-bar-striped"
+                        role="progressbar"
+                        id="progress_bar_aluno_{{aluno.id}}"
+                        aria-valuenow="{{aluno.percentual_acertos}}"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                      >{{aluno.percentual_acertos}}%</div>
+                      <script>
+
+                        var progress_bar = document.getElementById("progress_bar_aluno_{{aluno.id}}");
+                        var percentual_acertos = '{{aluno.percentual_acertos}}';
+                        percentual_acertos = parseFloat(percentual_acertos);
+                        if (percentual_acertos <= 25) {
+                          progress_bar.classList.add("bg-danger");
+                        } else if (percentual_acertos <= 50) {
+                          progress_bar.classList.add("bg-warning");
+                        } else if (percentual_acertos <= 75) {
+                          progress_bar.classList.add("bg-primary");
+                        } else {
+                          progress_bar.classList.add("bg-success");
+                        }
+                        progress_bar.style.width = percentual_acertos + "%";
+                      </script>
+                    </div>
+                  </td>
+                  <td>
+                    <a class="white-hover" target="_blank" href="{% url 'geral_visualizar_historico_aluno' aluno.id  %}"
+                    title="Visualizar Histórico do Aluno"
+                    ><i class="bx bx-show"></i></a>
+
+                  </td>
+                </tr>
+                {% endfor %}
+                <script>
+
+                </script>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!--/ Striped Rows -->
+      </div>
+
+
+      <div class="col-md-12 pt-4">
+        <!-- Striped Rows -->
+        <div class="card card-70">
+          <h5 class="card-header">Resultados Por Turma</h5>
+          <div class="table-responsive text-nowrap">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Turma</th>
+                  <th>Escola</th>
+                  <th>Percentual Acerto Médio</th>
+                  <th>Pontuação Média</th>
+                  <th>Situação da Turma</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody class="table-border-bottom-0">
+                {% for turma in turmas %}
+                <tr>
+                  <td><strong>{{turma.nome}}</strong></td>
+                  <td><strong>{{turma.escola}}</strong></td>
+                  <td>
+                    <div class="progress" >
+                      <div
+                        class="progress-bar progress-bar-striped"
+                        role="progressbar"
+                        id="progress_bar_{{turma.id}}"
+                        aria-valuenow="{{turma.percentual_acertos}}"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                      >{{turma.percentual_acertos}}%</div>
+                      <script>
+
+                        var progress_bar = document.getElementById("progress_bar_{{turma.id}}");
+                        var percentual_acertos = '{{turma.percentual_acertos}}';
+                        percentual_acertos = parseFloat(percentual_acertos);
+                        if (percentual_acertos <= 25) {
+                          progress_bar.classList.add("bg-danger");
+                        } else if (percentual_acertos <= 50) {
+                          progress_bar.classList.add("bg-warning");
+                        } else if (percentual_acertos <= 75) {
+                          progress_bar.classList.add("bg-primary");
+                        } else {
+                          progress_bar.classList.add("bg-success");
+                        }
+                        progress_bar.style.width = percentual_acertos + "%";
+                      </script>
+                    </div>
+                  </td>
+                  <td>
+                    {{turma.pontuacao_media}}
+                  </td>
+                  <td>
+                    {% if turma.situacao == "Abaixo do Básico" %}
+                    <span class="badge bg-danger">
+                      {% elif turma.situacao == "Básico" %}
+                          <span class="badge bg-warning">
+                      {% elif turma.situacao == "Adequado" %}
+                          <span class="badge bg-primary">
+                      {% elif turma.situacao == "Avançado" %}
+                          <span class="badge bg-success">
+                      {% endif %}
+                      {{turma.situacao}}
+                    </span>
+                  </td>
+                  <td>
+                    <a class="white-hover" target="_blank" href="{% url 'geral_visualizar_resultados_avaliacao_turma' turma.id %}"
+                    title="Ver Resultado da Escola"
+                    ><i class="bx bx-show"></i></a>
+
+                  </td>
+                </tr>
+                {% endfor %}
+                <script>
+
+                </script>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!--/ Striped Rows -->
+      </div>
+
+    </div>
+    
+</div>
+
 {% endblock %}

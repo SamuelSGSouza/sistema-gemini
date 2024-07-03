@@ -42,6 +42,16 @@ TIPOS_SIMULADOS = (
     ("questoes_gerais", "Avaliação Geral")
 )
 
+class Descritor(models.Model):
+    class Meta:
+        verbose_name = 'Descritor'
+        verbose_name_plural = 'Descritores'
+    descritor = models.CharField(max_length=255, verbose_name='Descritor', blank=True, null=True)
+    ano = models.CharField(max_length=255,verbose_name='Ano', blank=True, null=True, choices=GRAUS_ENSINO)
+
+    def __str__(self):
+        return self.descritor
+
 class UnidadeTematica(models.Model):
     class Meta:
         verbose_name = 'Unidade Temática'

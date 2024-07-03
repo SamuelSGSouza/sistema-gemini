@@ -7,11 +7,7 @@ A - Criar dashboard para usuários
 A - Adicionar campo de "bimestre" na hora de criar a avaliação
 A - Adicionar "Objeto do conhecimento" na hora de cadastrar a questão
 A - adicionar "Alunos", "Turmas" e "Escolas" na tela do coordenador geral
-A - Na Dashboard do coordenador aparecer gráficos gerais de resultados
-A - modificar para a lista de avaliações do coordenador aparecer na dashboard e ter apenas um botão lateral para cadastrar avaliação
 A - na lista de alunos, aparecer a nota do aluno para cada bimestre cada um em uma coluna.
-
-C - Colocar o descritor e a habilidade bncc como opções selecionáveis na hora de cadastrar a questão/avaliação
 
 Grau de Ensino
 	componente curricular/área do conhecimento (portugues, matemática, geografia...)
@@ -19,3 +15,8 @@ Grau de Ensino
 			Descritor
 				Habilidade da BNCC
 	
+
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*  PARA JULHO *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+- Na Dashboard do coordenador geral aparecer gráficos gerais de resultados
+- Modificar para a lista de avaliações do coordenador geral aparecer na dashboard e ter apenas um botão lateral para cadastrar avaliação
+- Colocar o descritor e a habilidade bncc como opções selecionáveis na hora de cadastrar a questão/avaliação
