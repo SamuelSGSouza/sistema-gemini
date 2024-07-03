@@ -190,15 +190,13 @@
 
             {% if request.session.classe == "Coordenador Geral" or request.session.classe == "Secretário" %}
               
-              {% if request.session.classe == "Coordenador Geral" %}
                 <!-- Dashboard -->
-                  <li class="menu-item active">
-                    <a href="" class="menu-link">
-                      <i class="menu-icon tf-icons bx bx-home-circle"></i>
-                      <div data-i18n="Analytics">Dashboard</div>
-                    </a>
-                  </li>
-              {% endif %}
+                <li class="menu-item active">
+                  <a href="{% url 'home_coordenador_geral' %}" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                    <div data-i18n="Analytics">Dashboard</div>
+                  </a>
+                </li>
               
 
               <li class="menu-header small text-uppercase">
@@ -210,12 +208,14 @@
                   <div data-i18n="Analytics">Listar Avaliações</div>
                 </a>
               </li>
-              <!-- <li class="menu-item">
+              {% if request.session.classe == "Coordenador Geral" %}
+              <li class="menu-item">
                 <a href="{% url 'coordenador_cadastro_avaliacao' %}" class="menu-link">
                   <i class='menu-icon bx bxs-file-doc'></i>
                   <div data-i18n="Analytics">Cadastrar Avaliação</div>
                 </a>
-              </li> -->
+              </li>
+              {% endif %}
             
 
               <!-- <li class="menu-header small text-uppercase">

@@ -659,7 +659,7 @@ class DashboardSuperUser(SuperUserGeralBaseView, TemplateView):
             rede = Secretario.objects.get(user=self.request.user).rede
 
         #pegando os simulados da rede
-        simulados = Simulado.objects.filter(responsavel__secretario__rede=rede)
+        simulados = Simulado.objects.filter(rede=rede)
         context = super().get_context_data(**kwargs)
         questoes = QuestaoReferencia.objects.filter(simulado__in=simulados)
         context['questoes'] = questoes
