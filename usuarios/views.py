@@ -13,16 +13,6 @@ from django.urls import reverse_lazy
 from simulados.models import *
 from collections import defaultdict
 import pandas as pd
-import datetime
-
-
-class TemplateView(TemplateView):
-    def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if datetime.datetime.now() > datetime.datetime(2024, 7, 5):
-            logout(request)
-            return redirect('login')
-        
-        return super().dispatch(request, *args, **kwargs)
 
 class LoginPageView(TemplateView):
     template_name = 'base_login.html'
