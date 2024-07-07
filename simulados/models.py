@@ -2,6 +2,15 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+
+
+MATRIZES_REFERENCIAIS = (
+    ('Matemática', 'Matemática'),
+    ('Humanas', 'Humanas'),
+    ('Linguagens', 'Linguagens'),
+    ('Ciências', 'Ciências')
+)
+
 COMPONENTES = (
     ("Língua Portuguesa", "Língua Portuguesa"),
     ("Arte", "Arte"),
@@ -14,12 +23,6 @@ COMPONENTES = (
     ('Matemática', 'Matemática'),
 )
 
-MATRIZES_REFERENCIAIS = (
-    ('Matemática', 'Matemática'),
-    ('Humanas', 'Humanas'),
-    ('Linguagens', 'Linguagens'),
-    ('Ciências', 'Ciências')
-)
 GRAUS_ENSINO = (
     ('1', '1º ano'),
     ('2', '2º ano'),
@@ -42,28 +45,42 @@ TIPOS_SIMULADOS = (
     ("questoes_gerais", "Avaliação Geral")
 )
 
-class Descritor(models.Model):
+class ComponenteCurricular(models.Model):
     class Meta:
-        verbose_name = 'Descritor'
-        verbose_name_plural = 'Descritores'
-    descritor = models.CharField(max_length=255, verbose_name='Descritor', blank=True, null=True)
-    ano = models.CharField(max_length=255,verbose_name='Ano', blank=True, null=True, choices=GRAUS_ENSINO)
+        verbose_name = 'Componente Curricular'
+        verbose_name_plural = 'Componentes Curriculares'
+    componente = models.CharField(max_length=255, verbose_name='Componente Curricular')
+    matriz_referencial = models.CharField(max_length=255, choices=MATRIZES_REFERENCIAIS,default='Matemática',verbose_name='Matriz Referencial')
 
     def __str__(self):
-        return self.descritor
+        return self.componente
 
 class UnidadeTematica(models.Model):
     class Meta:
         verbose_name = 'Unidade Temática'
         verbose_name_plural = 'Unidades Temáticas'
     unidade = models.CharField(max_length=255, verbose_name='Unidade Temática')
+    componente = models.ForeignKey(ComponenteCurricular, on_delete=models.CASCADE, verbose_name='Componente Curricular', blank=True, null=True)
     ano = models.CharField(max_length=255,verbose_name='Ano', blank=True, null=True,choices=GRAUS_ENSINO)
 
     def __str__(self):
         return self.unidade
 
+
+class Descritor(models.Model):
+    class Meta:
+        verbose_name = 'Descritor'
+        verbose_name_plural = 'Descritores'
+    descritor = models.CharField(max_length=255, verbose_name='Descritor', blank=True, null=True)
+    unidade_tematica = models.ForeignKey(UnidadeTematica, on_delete=models.CASCADE, verbose_name='Unidade Temática', blank=True, null=True)
+    ano = models.CharField(max_length=255,verbose_name='Ano', blank=True, null=True, choices=GRAUS_ENSINO)
+
+    def __str__(self):
+        return self.descritor
+
 class HabilidadesBNCC(models.Model):
     habilidade = models.CharField(max_length=255, verbose_name='Habilidade da BNCC')
+    descritor = models.ForeignKey(Descritor, on_delete=models.CASCADE, verbose_name='Descritor', blank=True, null=True)
     ano = models.CharField(max_length=255,verbose_name='Ano', blank=True, null=True, choices=GRAUS_ENSINO)
 
     def __str__(self):

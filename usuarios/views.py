@@ -808,11 +808,12 @@ class CreateAvaliacaoView(SuperUserGeralBaseView, TemplateView):
     template_name = 'criar/cria_avaliacao.html'
 
     def get(self, *args, **kwargs):
-        #pegando a lista de habilidade da HabilidadesBNCC
-        habilidades_bncc = list(HabilidadesBNCC.objects.all().values_list('habilidade', flat=True))
-        unidades = list(UnidadeTematica.objects.all().values_list('unidade', flat=True))
-        descritores = list(Descritor.objects.all().values_list('descritor', flat=True))
+        componentes = ComponenteCurricular.objects.all().order_by('componente')
+        unidades = UnidadeTematica.objects.all()
+        descritores = Descritor.objects.all()
+        habilidades_bncc = HabilidadesBNCC.objects.all()
         context = {
+            'componentes': componentes,
             'habilidades_bncc': habilidades_bncc,
             'unidades': unidades,
             'descritores': descritores

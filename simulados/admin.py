@@ -25,6 +25,11 @@ class RespostaAdmin(admin.ModelAdmin):
     list_display = ("resposta",)
     list_filter = ("resposta",)
 
+@admin.register(ComponenteCurricular)
+class ComponenteCurricularAdmin(admin.ModelAdmin):
+    list_display = ("componente",)
+    list_filter = ("componente",)
+
 @admin.register(Descritor)
 class DescritorAdmin(admin.ModelAdmin):
     list_display = ("descritor",)
