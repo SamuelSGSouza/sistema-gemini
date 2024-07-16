@@ -17,6 +17,5 @@ Grau de Ensino
 	
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*  PARA JULHO *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-- Na Dashboard do coordenador geral aparecer gráficos gerais de resultados
-- Modificar para a lista de avaliações do coordenador geral aparecer na dashboard e ter apenas um botão lateral para cadastrar avaliação
-- Colocar o descritor e a habilidade bncc como opções selecionáveis na hora de cadastrar a questão/avaliação
+- Na Dashboard do coordenador geral aparecer gráficos gerais de resultados por turma
+- Filtro na tela de listar avaliação

@@ -16,51 +16,138 @@
       
       <div class="container-fluid">
          
-        <div class="table-responsive text-nowrap pb-5 font-weight-bold">
-          <table class="table table-hover text-center">
-            <thead>
-              <tr >
-                <th class="font-weight-bold">Nome da Avaliação</th>
-                <th class="font-weight-bold">Nível da Avaliação</th>
-                <th class="font-weight-bold">Data de Criação</th>
-                <th class="font-weight-bold">Ações</th>
-              </tr>
-            </thead>
-            <tbody class="table-border-bottom-0">
-              {% for avaliacao in avaliacoes %}
-                  <tr>
-                    <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>{{avaliacao.nome}}</strong></td>
-                    <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>{{avaliacao.get_grau_ensino_display}}</strong></td>
-                    <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>{{avaliacao.criacao|date:"d/m/Y"}}</strong></td>
-                    <td>
-                        <a class="white-hover" target="_blank" href="{% url 'coordenador_visualizar_avaliacao' avaliacao.id %}"
-                        title="Visualizar Avaliação"
-                        ><i class="bx bx-show"></i></a>
-                        <a class="white-hover"  href="{% url 'coordenador_geral_visualizar_resultados_avaliacao' avaliacao.id %}"
-                        title="Visualizar Resultados"
-                        ><i class="bx bx-bar-chart-alt-2 mx-1"></i></a>
-
-                        {% if request.session.classe == "Coordenador Geral" %}
-                        <a class="white-hover text-danger" href=""
-                        title="Deletar Avaliação"
-                        data-bs-toggle="modal"
-                        data-bs-target="#modalCenter"
-                        onclick="mudaID('{{avaliacao.id}}', '{{avaliacao.nome}}')"><i class="bx bx-trash mx-1"></i></a
-                        >
-                        {% endif %}
-
-                    </td>
-                  </tr>
-                {% endfor %}
-            </tbody>
-          </table>
-          
+        <div>
+          <form action="" method="GET">
+            {% csrf_token %}
+            <div class="infos-avaliacao mb-4">
+              <p class="card-title text-primary">FILTRAR POR DADOS DA AVALIAÇÃO</p>
+              <hr>
+              <div class="row">
   
+                <div class="col-md-3">
+                  <div class="mb-3">
+                    <label class="form-label" for="NomeAvaliacao">Nome da Avaliação</label>
+                    <input value="{{ request.GET.nome }}" type="text" class="form-control" id="NomeAvaliacao" name="nome" aria-describedby="Nome da Avaliação">
+                  </div>
+                </div>
+
+                <div class="col-md-3">
+                  <div class="mb-3">
+                    <label class="form-label" for="UnidadeTematica">Nível da Avaliação</label>
+                    <select id="nivelAvaliacao" class="form-select" name="nivel" aria-label="Nível da Avaliação">
+                      <option value="">Selecione o nível</option>
+                      <option value="1">1º ano</option>
+                      <option value="2">2º ano</option>
+                      <option value="3">3º ano</option>
+                      <option value="4">4º ano</option>
+                      <option value="5">5º ano</option>
+                      <option value="6">6º ano</option>
+                      <option value="7">7º ano</option>
+                      <option value="8">8º ano</option>
+                      <option value="9">9º ano</option>
+                      <option value="10">1º ano do Ensino Médio</option>
+                      <option value="11">2º ano do Ensino Médio</option>
+                      <option value="12">3º ano do Ensino Médio</option>
+                    </select>
+                  </div>
+                </div>
+
+
+                <div class="col-md-3">
+                  <div class="mb-3">
+                    <label class="form-label" for="UnidadeTematica">Data de Criação da Avaliação</label>
+                    <input type="date" class="form-control" id="DataCriacao" value="{{ request.GET.criacao }}" name="criacao" aria-describedby="Data de Criação">
+                  </div>
+                </div>
+
+                <div class="col-md-3">
+                  <div class="mb-3">
+                    <label class="form-label" for="MatrizReferencial">Matriz Referencial</label>
+                    <select name="matriz_referencial" class="form-select" id="MatrizReferencial" aria-label="Matriz Referencial">
+                      <option selected value="">Selecione uma Matriz Referencial</option>
+                      <option value="Matemática">Matemática</option>
+                      <option value="Humanas">Humanas</option>
+                      <option value="Linguagens">Linguagens</option>
+                      <option value="Ciências">Ciências</option>
+                    </select>
+                  </div>
+                </div>
+  
+  
+              </div>
+            </div>
+            
+            <div class="d-flex flex-row-reverse mb-5">
+              <div><button type="submit" class="btn btn-primary px-5">Filtrar</button></div>
+                
+            </div>
+            
+          </form> 
         </div>
+        <div class="table-wrap">
+          <div class="table-responsive text-nowrap pb-5 font-weight-bold">
+            <table class="table table-hover text-center">
+              <thead>
+                <tr >
+                  <th class="font-weight-bold">Nome da Avaliação</th>
+                  <th class="font-weight-bold">Nível da Avaliação</th>
+                  <th class="font-weight-bold">Data de Criação</th>
+                  <th class="font-weight-bold">Ações</th>
+                </tr>
+              </thead>
+              <tbody class="table-border-bottom-0">
+                {% for avaliacao in avaliacoes %}
+                    <tr>
+                      <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>{{avaliacao.nome}}</strong></td>
+                      <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>{{avaliacao.get_grau_ensino_display}}</strong></td>
+                      <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>{{avaliacao.criacao|date:"d/m/Y"}}</strong></td>
+                      <td>
+                          <a class="white-hover" target="_blank" href="{% url 'coordenador_visualizar_avaliacao' avaliacao.id %}"
+                          title="Visualizar Avaliação"
+                          ><i class="bx bx-show"></i></a>
+                          <a class="white-hover"  href="{% url 'coordenador_geral_visualizar_resultados_avaliacao' avaliacao.id %}"
+                          title="Visualizar Resultados"
+                          ><i class="bx bx-bar-chart-alt-2 mx-1"></i></a>
+  
+                          {% if request.session.classe == "Coordenador Geral" %}
+                          <a class="white-hover text-danger" href=""
+                          title="Deletar Avaliação"
+                          data-bs-toggle="modal"
+                          data-bs-target="#modalCenter"
+                          onclick="mudaID('{{avaliacao.id}}', '{{avaliacao.nome}}')"><i class="bx bx-trash mx-1"></i></a
+                          >
+                          {% endif %}
+  
+                      </td>
+                    </tr>
+                  {% endfor %}
+              </tbody>
+            </table>
+            
+    
+          </div>
+        </div>
+        
 
       </div>
 
-      {% include 'parcials/_pagination.html' %}
+      <div class="pagination my-pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a class="page-owner" href="?page=1&nome={{ request.GET.nome }}&nivel={{ request.GET.nivel }}&criacao={{ request.GET.criacao }}&matriz_referencial={{ request.GET.matriz_referencial }}">&laquo; Início</a>
+                <a class="page-owner" href="?page={{ page_obj.previous_page_number }}&nome={{ request.GET.nome }}&nivel={{ request.GET.nivel }}&criacao={{ request.GET.criacao }}&matriz_referencial={{ request.GET.matriz_referencial }}">Anterior</a>
+            {% endif %}
+    
+            <span class="current">
+                Pág {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+            </span>
+    
+            {% if page_obj.has_next %}
+                <a class="page-owner" href="?page={{ page_obj.next_page_number }}&nome={{ request.GET.nome }}&nivel={{ request.GET.nivel }}&criacao={{ request.GET.criacao }}&matriz_referencial={{ request.GET.matriz_referencial }}">Próxima</a>
+                <a class="page-owner" href="?page={{ page_obj.paginator.num_pages }}&nome={{ request.GET.nome }}&nivel={{ request.GET.nivel }}&criacao={{ request.GET.criacao }}&matriz_referencial={{ request.GET.matriz_referencial }}">Fim &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
 
         </div>
       </div>
@@ -96,6 +183,61 @@ function mudaID(id, nome){
   document.getElementById("modalCenterTitle").innerHTML = "Deseja excluir a avaliação - " + nome + " - ?";
   document.getElementById("idExcluir").value = id;
 }
+
+  //onchage para exibir os componentes curriculares de acordo com a matriz referencial
+  document.getElementById("MatrizReferencial").onchange = function() {
+    var matriz_referencial = this.value;
+    var componentes = document.querySelectorAll("#ComponenteCurricular option");
+    componentes.forEach(function(componente) {
+      if (componente.dataset.matriz_referencial == matriz_referencial) {
+        componente.style.display = "block";
+      } else {
+        componente.style.display = "none";
+      }
+    });
+  }
+
+
+  //onchage para exibir as unidades temáticas de acordo com o componente curricular
+  document.getElementById("ComponenteCurricular").onchange = function() {
+    var componente = this.value;
+    var unidades = document.querySelectorAll("#UnidadeTematica option");
+    unidades.forEach(function(unidade) {
+      if (unidade.dataset.componente == componente) {
+        unidade.style.display = "block";
+      } else {
+        unidade.style.display = "none";
+      }
+    });
+  }
+  
+
+  //onchage para exibir os descritores de acordo com a unidade temática
+  document.getElementById("UnidadeTematica").onchange = function() {
+    var unidade_tematica = this.value;
+    var descritores = document.querySelectorAll("#Descritor option");
+    descritores.forEach(function(descritor) {
+      if (descritor.dataset.unidade_tematica == unidade_tematica) {
+        descritor.style.display = "block";
+      } else {
+        descritor.style.display = "none";
+      }
+    });
+  }
+
+
+  //onchage para exibir as habilidades de acordo com o descritor
+  document.getElementById("Descritor").onchange = function() {
+    var descritor = this.value;
+    var habilidades = document.querySelectorAll("#HabilidadeBNCC option");
+    habilidades.forEach(function(habilidade) {
+      if (habilidade.dataset.descritor == descritor) {
+        habilidade.style.display = "block";
+      } else {
+        habilidade.style.display = "none";
+      }
+    });
+  }
 </script>
 {% endblock %}
     

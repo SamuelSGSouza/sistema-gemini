@@ -13,6 +13,7 @@ from django.urls import reverse_lazy
 from simulados.models import *
 from collections import defaultdict
 import pandas as pd
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 class LoginPageView(TemplateView):
     template_name = 'base_login.html'
@@ -794,8 +795,42 @@ class ListaAvaliacoesView(SuperUserGeralBaseView, ListView):
             rede = Secretario.objects.get(user=self.request.user).rede
         else:
             rede = None
+
+        self.request.session['rede'] = rede
         qs = qs.filter(rede = rede)
+
+        if self.request.GET.get('nome'):
+            qs = qs.filter(nome__icontains=self.request.GET.get('nome'))
+
+        if self.request.GET.get('criacao'):
+            qs = qs.filter(criacao=self.request.GET.get('criacao'))
+
+        if self.request.GET.get('matriz_referencial'):
+            qs = qs.filter(matriz_referencial=self.request.GET.get('matriz_referencial'))
+
+        if self.request.GET.get('nivel'):
+            qs = qs.filter(grau_ensino=self.request.GET.get('nivel'))
+
         return qs
+    
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        rede = self.request.session.get('rede')
+        turmas = Turma.objects.filter(escola__rede=rede)
+        componentes = ComponenteCurricular.objects.all().order_by('componente')
+        unidades = UnidadeTematica.objects.all()
+        descritores = Descritor.objects.all()
+        habilidades_bncc = HabilidadesBNCC.objects.all()
+        context['componentes'] = componentes
+        context['habilidades_bncc'] = habilidades_bncc
+        context['unidades'] = unidades
+        context['descritores'] = descritores
+        context['turmas'] = turmas
+        
+        return context
+
+class DeleteAvaliacaoView(SuperUserGeralBaseView, TemplateView):
+    template_name = 'usuarios/superuser/lista_avaliacao.html'
 
     def post(self, *args, **kwargs):
         id = self.request.POST.get('id')

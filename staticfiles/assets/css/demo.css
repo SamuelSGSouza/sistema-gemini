@@ -105,3 +105,11 @@
   text-align: center;
   margin-top: 1rem;
 }
+
+.table-wrap{
+  border: 1px solid #e9ecef;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
