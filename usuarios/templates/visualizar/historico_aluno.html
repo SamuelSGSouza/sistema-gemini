@@ -39,7 +39,7 @@
           <!-- /Account -->
         </div>
         <div class="card .card-70">
-          <h5 class="card-header">Histórico do Aluno</h5>
+          <h5 class="card-header">Percentual de acerto por ano e matriz referencial</h5>
           <div class="card-body">
             <div class="mb-3 col-12 mb-0">
               
@@ -48,43 +48,28 @@
                 <table class="table table-striped">
                   <thead>
                     <tr>
-                      <th>Avaliação</th>
-                      <th>Data de Criação</th>
-                      <th>Percentual de Acerto</th>
+                      <th>Matriz Referêncial</th>
+                      <th>1º Ano</th>
+                      <th>2º Ano</th>
+                      <th>3º Ano</th>
+                      <th>4º Ano</th>
+                      <th>5º Ano</th>
+                      <th>6º Ano</th>
+                      <th>7º Ano</th>
+                      <th>8º Ano</th>
+                      <th>9º Ano</th>
+                      <th>1º EM</th>
+                      <th>2º EM</th>
+                      <th>3º EM</th>
                     </tr>
                   </thead>
                   <tbody class="table-border-bottom-0">
-                    {% for av in simulados %}
-                    <tr>
-                      <td><strong>{{av.simulado.nome}}</strong></td>
-                      <td>{{av.criacao}}</td>
-                      <td>
-                        <div class="progress" >
-                          <div
-                            class="progress-bar progress-bar-striped"
-                            role="progressbar"
-                            id="progress_bar_av_{{av.simulado.id}}"
-                            aria-valuenow="{{av.percentual_acertos}}"
-                            aria-valuemin="0"
-                            aria-valuemax="100"
-                          >{{av.percentual_acertos}}%</div>
-                          <script>
-    
-                            var progress_bar = document.getElementById("progress_bar_av_{{av.simulado.id}}");
-                            var percentual_acertos = '{{av.percentual_acertos}}';
-                            percentual_acertos = parseFloat(percentual_acertos);
-                            if (percentual_acertos < 50) {
-                              progress_bar.classList.add("bg-danger");
-                            } else if (percentual_acertos < 70) {
-                              progress_bar.classList.add("bg-warning");
-                            } else {
-                              progress_bar.classList.add("bg-success");
-                            }
-                            progress_bar.style.width = percentual_acertos + "%";
-                          </script>
-                        </div>
-                      </td>
-                    </tr>
+                    {% for matriz in matrizes %}
+                      <tr>
+                        {% for row in matriz %}
+                          <td><strong>{{row}}</strong></td>
+                        {% endfor %}
+                      </tr>
                     {% endfor %}
                     <script>
     

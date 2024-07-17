@@ -1357,33 +1357,93 @@ class VisualizarHistoricoAluno(TemplateView, LoginRequiredMixin):
 
         #pegando as avaliações que o aluno respondeu
         respostas = Resposta.objects.filter(aluno=aluno)
+        matrizes = {
+            "Matemática": {
+                "ano_1": [],
+                "ano_2": [],
+                "ano_3": [],
+                "ano_4": [],
+                "ano_5": [],
+                "ano_6": [],
+                "ano_7": [],
+                "ano_8": [],
+                "ano_9": [],
+                "ano_10": [],
+                "ano_11": [],
+                "ano_12": [],
+            },
+            "Humanas": {
+                "ano_1": [],
+                "ano_2": [],
+                "ano_3": [],
+                "ano_4": [],
+                "ano_5": [],
+                "ano_6": [],
+                "ano_7": [],
+                "ano_8": [],
+                "ano_9": [],
+                "ano_10": [],
+                "ano_11": [],
+                "ano_12": [],
+            },
+            "Linguagens": {
+                "ano_1": [],
+                "ano_2": [],
+                "ano_3": [],
+                "ano_4": [],
+                "ano_5": [],
+                "ano_6": [],
+                "ano_7": [],
+                "ano_8": [],
+                "ano_9": [],
+                "ano_10": [],
+                "ano_11": [],
+                "ano_12": [],
+            },
+            "Ciências": {
+                "ano_1": [],
+                "ano_2": [],
+                "ano_3": [],
+                "ano_4": [],
+                "ano_5": [],
+                "ano_6": [],
+                "ano_7": [],
+                "ano_8": [],
+                "ano_9": [],
+                "ano_10": [],
+                "ano_11": [],
+                "ano_12": [],
+            }
+        }
         simulados = []
         for resposta in respostas:
-            simulado = resposta.questao_referencia.simulado
-            if simulado not in simulados:
-                simulados.append(simulado)
+            matriz_referencial = resposta.questao_referencia.simulado.matriz_referencial
+            grau_ensino = resposta.questao_referencia.simulado.grau_ensino
+            matrizes[matriz_referencial]["ano_"+grau_ensino].append(resposta.acertou)
+                
+        
 
-        #contando percentual de acerto por simulado
-        simulados_dict = []
-        for simulado in simulados:
-            respostas_simulado = respostas.filter(questao_referencia__simulado=simulado)
-            total_acertos = respostas_simulado.filter(acertou=True).count()
-            percentual_acertos = round((total_acertos/respostas_simulado.count())*100, 2)
-            simulados_dict.append({
-                'simulado': simulado,
-                'percentual_acertos': percentual_acertos,
-                'total_acertos': total_acertos,
-                'total_respostas': respostas_simulado.count(),
-                'criacao': simulado.criacao
-            })
+        #calculando o percentual de acertos
+        for matriz in matrizes:
+            for ano in matrizes[matriz]:
+                if len(matrizes[matriz][ano]) > 0:
+                    matrizes[matriz][ano] = f"{round((sum(matrizes[matriz][ano])/len(matrizes[matriz][ano]))*100, 2)}%"
+                else:
+                    matrizes[matriz][ano] = "0%"
 
-        #ordenando simulados por data de criação
-        simulados_dict = sorted(simulados_dict, key=lambda x: x['criacao'], reverse=True)
+        #tarnsformando em lista
+        lista_matrizes = []
+        for k,v in matrizes.items():
+            lista = [k,]
+            for f,g in v.items():
+                lista.append(g)
 
-
+            lista_matrizes.append(lista)
+        
         context = {
             'aluno': aluno,
-            'simulados': simulados_dict
+            'matrizes': lista_matrizes,
+            'simulados': simulados
         }
         
         return render(request, self.template_name, context)

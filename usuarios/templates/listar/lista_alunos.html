@@ -35,6 +35,10 @@
                         <td>{{aluno.turma}}</td>
                         <td>
                             <a class="white-hover"
+                              title="Visualizar Aluno"
+                              href="{% url 'geral_visualizar_historico_aluno' aluno.id  %}"
+                              ><i class="bx bx-show"></i><i class="fa fa-eye mx-1"></i></a>
+                            <a class="white-hover"
                               title="Editar Aluno"
                              href="{% url 'coordenador_edita_aluno' aluno.id %}"
                                 ><i class="bx bx-edit-alt me-1"></i> <i class="fa fa-edit
