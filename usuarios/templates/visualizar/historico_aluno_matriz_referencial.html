@@ -10,7 +10,7 @@
     <div class="row">
       <div class="col-md-12">
         <div class="card mb-4">
-          <h5 class="card-header">Detalhes do Aluno</h5>
+          <h5 class="card-header">Detalhes do Aluno na Matriz Referencial: </h5>
           <!-- Account -->
           <hr class="my-0" />
           <div class="card-body">
@@ -39,7 +39,7 @@
           <!-- /Account -->
         </div>
         <div class="card .card-70">
-          <h5 class="card-header">Percentual de acerto por ano e matriz referencial</h5>
+          <h5 class="card-header">Percentual de acerto por Ano e Componente Currícular</h5>
           <div class="card-body">
             <div class="mb-3 col-12 mb-0">
               
@@ -48,7 +48,7 @@
                 <table class="table table-striped">
                   <thead>
                     <tr>
-                      <th>Matriz Referêncial</th>
+                      <th>Componente Curricular</th>
                       <th>1º Ano</th>
                       <th>2º Ano</th>
                       <th>3º Ano</th>
@@ -64,20 +64,12 @@
                     </tr>
                   </thead>
                   <tbody class="table-border-bottom-0">
-                    {% for matriz in matrizes %}
-                        <tr>
-                          
-
-                          {% for row in matriz.lista %}
-                            <td>
-                              <a href="{% url 'geral_visualizar_historico_aluno_matriz_referencial'  %}?matriz_referencial={{matriz.nome}}">
-                              <strong>{{row}}</strong>
-                              </a>
-                            </td>
-                          {% endfor %}
-                        
-
-                        </tr>
+                    {% for componente in componentes %}
+                      <tr>
+                        {% for row in componente %}
+                          <td><strong>{{row}}</strong></td>
+                        {% endfor %}
+                      </tr>
                     {% endfor %}
                     <script>
     
