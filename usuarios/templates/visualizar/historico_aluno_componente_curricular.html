@@ -64,11 +64,11 @@
                     </tr>
                   </thead>
                   <tbody class="table-border-bottom-0">
-                    {% for componente in componentes %}
+                    {% for unidade in unidades_tematicas %}
                       
                       <tr>
-                        {% for row in componente.lista %}
-                          <td><a href="{% url 'geral_visualizar_historico_aluno_componente_curricular' %}?componente_curricular={{componente.nome}}"><strong>{{row}}</strong></a></td>
+                        {% for row in unidade.lista %}
+                          <td><a href="{% url 'geral_visualizar_historico_aluno_unidade_tematica' %}?unidade_tematica={{unidade.nome}}"><strong>{{row}}</strong></a></td>
                         {% endfor %}
                       </tr>
                     {% endfor %}

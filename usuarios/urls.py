@@ -50,7 +50,8 @@ urlpatterns = [
     path('geral/visualizar/resultados_turma/<int:pk>', views.VisualizarResultadoAvaliacaoTurma.as_view(), name='geral_visualizar_resultados_avaliacao_turma'),
     path('geral/visualizar/historico_aluno/<int:pk>', views.VisualizarHistoricoAluno.as_view(), name='geral_visualizar_historico_aluno'),
     path('geral/visualizar/historico_aluno_matriz_referencial', views.VisualizarHistoricoAlunoMatrizReferencial.as_view(), name='geral_visualizar_historico_aluno_matriz_referencial'),
-
+    path('geral/visualizar/historico_aluno_componente_curricular', views.VisualizarHistoricoAlunoComponenteCurricular.as_view(), name='geral_visualizar_historico_aluno_componente_curricular'),
+    path('geral/visualizar/historico_aluno_unidade_tematica', views.VisualizarHistoricoAlunoUnidadeTematica.as_view(), name='geral_visualizar_historico_aluno_unidade_tematica'),
 
     path('cadastra_alunos', views.CadastrarAlunosLote.as_view(), name='cadastra_alunos_lote'),
 ]

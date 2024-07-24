@@ -61,7 +61,6 @@ class UnidadeTematica(models.Model):
         verbose_name_plural = 'Unidades Temáticas'
     unidade = models.CharField(max_length=255, verbose_name='Unidade Temática')
     componente = models.ForeignKey(ComponenteCurricular, on_delete=models.CASCADE, verbose_name='Componente Curricular', blank=True, null=True)
-    ano = models.CharField(max_length=255,verbose_name='Ano', blank=True, null=True,choices=GRAUS_ENSINO)
 
     def __str__(self):
         return self.unidade
@@ -73,7 +72,6 @@ class Descritor(models.Model):
         verbose_name_plural = 'Descritores'
     descritor = models.CharField(max_length=255, verbose_name='Descritor', blank=True, null=True)
     unidade_tematica = models.ForeignKey(UnidadeTematica, on_delete=models.CASCADE, verbose_name='Unidade Temática', blank=True, null=True)
-    ano = models.CharField(max_length=255,verbose_name='Ano', blank=True, null=True, choices=GRAUS_ENSINO)
 
     def __str__(self):
         return self.descritor
@@ -81,7 +79,6 @@ class Descritor(models.Model):
 class HabilidadesBNCC(models.Model):
     habilidade = models.CharField(max_length=255, verbose_name='Habilidade da BNCC')
     descritor = models.ForeignKey(Descritor, on_delete=models.CASCADE, verbose_name='Descritor', blank=True, null=True)
-    ano = models.CharField(max_length=255,verbose_name='Ano', blank=True, null=True, choices=GRAUS_ENSINO)
 
     def __str__(self):
         return self.habilidade

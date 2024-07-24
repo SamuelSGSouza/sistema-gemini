@@ -1152,7 +1152,7 @@ class ProfessorEditAlunoView(AlunoView, DetailView):
 
 
 ############# GERAL ################
-class VisualizarResultadoAvaliacaoEscola(TemplateView, LoginRequiredMixin):
+class VisualizarResultadoAvaliacaoEscola(LoginRequiredMixin,TemplateView):
     login_url = reverse_lazy('login')
     template_name = 'visualizar/resultado_avaliacao_escola.html'
 
@@ -1249,7 +1249,7 @@ class VisualizarResultadoAvaliacaoEscola(TemplateView, LoginRequiredMixin):
         }
         return render(self.request, self.template_name, context)
 
-class VisualizarResultadoAvaliacaoTurma(TemplateView, LoginRequiredMixin):
+class VisualizarResultadoAvaliacaoTurma(LoginRequiredMixin,TemplateView):
     login_url = reverse_lazy('login')
     template_name = 'visualizar/resultado_avaliacao_turma.html'
 
@@ -1347,7 +1347,7 @@ class VisualizarResultadoAvaliacaoTurma(TemplateView, LoginRequiredMixin):
         }
         return render(self.request, self.template_name, context)  
 
-class VisualizarHistoricoAluno(TemplateView, LoginRequiredMixin):
+class VisualizarHistoricoAluno(LoginRequiredMixin,TemplateView):
     template_name = 'visualizar/historico_aluno.html'
     login_url = reverse_lazy('login')
 
@@ -1455,14 +1455,14 @@ class VisualizarHistoricoAluno(TemplateView, LoginRequiredMixin):
         
         return render(request, self.template_name, context)
 
-class VisualizarHistoricoAlunoMatrizReferencial(TemplateView, LoginRequiredMixin):
+class VisualizarHistoricoAlunoMatrizReferencial(LoginRequiredMixin,TemplateView):
     template_name = 'visualizar/historico_aluno_matriz_referencial.html'
     login_url = reverse_lazy('login')
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         id_aluno = self.request.session['aluno_id']
         matriz_referencial = self.request.GET.get('matriz_referencial')
-        print("Matriz referencial: ", matriz_referencial)
+        
         aluno = Aluno.objects.get(id=id_aluno)
 
         #pegando as avaliações que o aluno respondeu
@@ -1495,16 +1495,121 @@ class VisualizarHistoricoAlunoMatrizReferencial(TemplateView, LoginRequiredMixin
 
             lista_componentes.append(lista)
 
-        print(lista_componentes)
+        nome_componentes = []
+        for componente in lista_componentes:
+            nome_componentes.append(
+                {"nome": componente[0], "lista": componente}
+            )
         context = {
             'aluno': aluno,
-            'componentes': lista_componentes,
+            'componentes': nome_componentes,
             'matriz_referencial': matriz_referencial
         }
         return render(request, self.template_name, context)
 
+class VisualizarHistoricoAlunoComponenteCurricular(LoginRequiredMixin,TemplateView):
+    template_name = 'visualizar/historico_aluno_componente_curricular.html'
+    login_url = reverse_lazy('login')
 
-class CadastrarAlunosLote(TemplateView, LoginRequiredMixin):
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        id_aluno = self.request.session['aluno_id']
+        componente_curricular = self.request.GET.get('componente_curricular')
+        aluno = Aluno.objects.get(id=id_aluno)
+
+        #pegando as avaliações que o aluno respondeu
+        respostas = Resposta.objects.filter(aluno=aluno, questao_referencia__questao__componente=componente_curricular)
+        unidades_tematicas = list(respostas.values_list('questao_referencia__questao__unidade_tematica_texto', flat=True).distinct())
+        anos = ["ano_1", "ano_2", "ano_3", "ano_4", "ano_5", "ano_6", "ano_7", "ano_8", "ano_9", "ano_10", "ano_11", "ano_12"]
+
+        dict_unidades_tematicas = {}
+        for unidade_tematica in unidades_tematicas:
+            dict_unidades_tematicas[unidade_tematica] = {}
+            for ano in anos:
+                dict_unidades_tematicas[unidade_tematica][ano] = []
+                for resposta in respostas.filter(questao_referencia__questao__unidade_tematica_texto=unidade_tematica, questao_referencia__simulado__grau_ensino=ano.split('_')[1]):
+                    dict_unidades_tematicas[unidade_tematica][ano].append(resposta.acertou)
+
+        #calculando o percentual de acertos
+        for unidade_tematica in dict_unidades_tematicas:
+            for ano in dict_unidades_tematicas[unidade_tematica]:
+                if len(dict_unidades_tematicas[unidade_tematica][ano]) > 0:
+                    dict_unidades_tematicas[unidade_tematica][ano] = f"{round((sum(dict_unidades_tematicas[unidade_tematica][ano])/len(dict_unidades_tematicas[unidade_tematica][ano]))*100, 2)}%"
+                else:
+                    dict_unidades_tematicas[unidade_tematica][ano] = "0%"
+                
+        lista_unidades_tematicas = []
+        for k,v in dict_unidades_tematicas.items():
+            lista = [k,]
+            for f,g in v.items():
+                lista.append(g)
+
+            lista_unidades_tematicas.append(lista)
+
+        nome_unidades_tematicas = []
+        for unidade_tematica in lista_unidades_tematicas:
+            nome_unidades_tematicas.append(
+                {"nome": unidade_tematica[0], "lista": unidade_tematica}
+            )
+        context = {
+            'aluno': aluno,
+            'unidades_tematicas': nome_unidades_tematicas,
+            'componente_curricular': componente_curricular
+        }
+        return render(request, self.template_name, context)
+
+class VisualizarHistoricoAlunoUnidadeTematica(LoginRequiredMixin, TemplateView):
+    template_name = 'visualizar/historico_aluno_unidade_tematica.html'
+    login_url = reverse_lazy('login')
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        id_aluno = self.request.session['aluno_id']
+        unidade_tematica = self.request.GET.get('unidade_tematica')
+        aluno = Aluno.objects.get(id=id_aluno)
+
+        #pegando as avaliações que o aluno respondeu
+        respostas = Resposta.objects.filter(aluno=aluno, questao_referencia__questao__unidade_tematica_texto=unidade_tematica)
+        descritores = list(respostas.values_list('questao_referencia__questao__descritor', flat=True).distinct())
+
+        #pegando os anos que o aluno respondeu
+        anos = ["ano_1", "ano_2", "ano_3", "ano_4", "ano_5", "ano_6", "ano_7", "ano_8", "ano_9", "ano_10", "ano_11", "ano_12"]
+
+        dict_descritores = {}
+        for descritor in descritores:
+            dict_descritores[descritor] = {}
+            for ano in anos:
+                dict_descritores[descritor][ano] = []
+                for resposta in respostas.filter(questao_referencia__questao__descritor=descritor, questao_referencia__simulado__grau_ensino=ano.split('_')[1]):
+                    dict_descritores[descritor][ano].append(resposta.acertou)
+
+        #calculando o percentual de acertos
+        for descritor in dict_descritores:
+            for ano in dict_descritores[descritor]:
+                if len(dict_descritores[descritor][ano]) > 0:
+                    dict_descritores[descritor][ano] = f"{round((sum(dict_descritores[descritor][ano])/len(dict_descritores[descritor][ano]))*100, 2)}%"
+                else:
+                    dict_descritores[descritor][ano] = "0%"
+
+        lista_descritores = []
+        for k,v in dict_descritores.items():
+            lista = [k,]
+            for f,g in v.items():
+                lista.append(g)
+
+            lista_descritores.append(lista)
+
+        nome_descritores = []
+        for descritor in lista_descritores:
+            nome_descritores.append(
+                {"nome": descritor[0], "lista": descritor}
+            )
+        context = {
+            'aluno': aluno,
+            'descritores': nome_descritores,
+            'unidade_tematica': unidade_tematica
+        }
+        return render(request, self.template_name, context)
+
+class CadastrarAlunosLote(LoginRequiredMixin,TemplateView):
     template_name = 'cadastrar_alunos_lote.html'
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
