@@ -43,6 +43,90 @@
           <div class="card-body">
             <div class="mb-3 col-12 mb-0">
               
+              <canvas id="meuGrafico" width="400" height="200"></canvas>
+                <script>
+                    // Obtém o contexto do canvas onde o gráfico será desenhado
+            var ctx = document.getElementById('meuGrafico').getContext('2d');
+
+                var cores = [
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(255, 0, 0, 1)',
+                    'rgba(255, 0, 0, 0.2)',
+                    'rgba(0, 0, 255, 1)',
+                    'rgba(0, 0, 255, 0.2)',
+                    'rgba(255, 255, 0, 1)',
+                    'rgba(255, 255, 0, 0.2)',
+                    'rgba(0, 255, 255, 1)',
+                    'rgba(0, 255, 255, 0.2)',
+                    'rgba(255, 0, 255, 1)',
+                    'rgba(255, 0, 255, 0.2)',
+                    'rgba(0, 255, 0, 1)',
+                    'rgba(0, 255, 0, 0.2)',
+                    'rgba(255, 255, 255, 1)',
+                    'rgba(255, 255, 255, 0.2)',
+                  ]
+              var index_cores = 0;
+              //gerando dataset
+              var dataset = [];
+              {% for matriz in matrizes %}
+                var lista = [];
+                {% for row in matriz.lista %}
+                  lista.push(parseFloat('{{row}}'));
+                {% endfor %}
+                  //fazendo lista pegar tudo depois do 0
+                  lista = lista.slice(1, lista.length);
+                dataset.push({
+                  label: '{{matriz.nome}}',
+                  data: lista,
+                  borderColor: cores[index_cores++],
+                  backgroundColor: cores[index_cores],
+                  fill: true
+                });
+                index_cores++;
+              {% endfor %}
+              console.log(dataset);
+
+            // Dados para o gráfico de linhas
+            var dados = {
+                labels: ['1º ano', '2º ano', '3º ano', '4º ano', '5º ano', '6º ano', '7º ano', '8º ano', '9º ano', '1º EM', '2º EM', '3º EM'],
+                datasets: dataset  
+              
+                
+            };
+
+            // Configurações do gráfico
+            var new_config = {
+                type: 'line',
+                data: dados,
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Ano Escolar'
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Pontuação'
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Cria e renderiza o gráfico
+            var meuGrafico = new Chart(ctx, new_config);
+
+                </script>
+            </div>
+            <div class="mb-3 col-12 mb-0">
+              
 
               <div class="table-responsive text-nowrap">
                 <table class="table table-striped">

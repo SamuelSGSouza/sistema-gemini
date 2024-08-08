@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráfico de Linhas com Chart.js</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <canvas id="meuGrafico" width="400" height="200"></canvas>
+    <script>
+        // Obtém o contexto do canvas onde o gráfico será desenhado
+var ctx = document.getElementById('meuGrafico').getContext('2d');
+
+// Dados para o gráfico de linhas
+var dados = {
+    labels: ['1º ano', '2º ano', '3º ano', '4º ano', '5º ano', '6º ano', '7º ano'],
+    datasets: [{
+    label: '2E1.1',
+        data: [65, 59, 80, 81, 56, 55, 40],
+        borderColor: 'rgba(75, 192, 192, 1)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        fill: true
+    },
+    {
+        label: '2E1.2',
+        data: [35, 89, 30, 55, 2, 12, 32],
+        borderColor: 'rgba(255, 0, 0, 1)',
+        backgroundColor: 'rgba(255, 0, 0, 0.2)',
+        fill: true
+    }
+    ]
+};
+
+// Configurações do gráfico
+var config = {
+    type: 'line',
+    data: dados,
+    options: {
+        responsive: true,
+        scales: {
+            x: {
+                display: true,
+                title: {
+                    display: true,
+                    text: 'Ano Escolar'
+                }
+            },
+            y: {
+                display: true,
+                title: {
+                    display: true,
+                    text: 'Pontuação'
+                }
+            }
+        }
+    }
+};
+
+// Cria e renderiza o gráfico
+var meuGrafico = new Chart(ctx, config);
+
+    </script>
+</body>
+</html>
